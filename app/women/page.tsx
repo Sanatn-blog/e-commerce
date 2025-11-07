@@ -86,14 +86,14 @@ export default function Women() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
-      <div className="bg-gradient-to-r from-pink-600 to-purple-600 text-white py-16">
+      <div className="bg-linear-to-r from-pink-600 to-purple-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Women's Collection
+            Women&apos;s Collection
           </h1>
           <p className="text-lg md:text-xl text-pink-100 max-w-2xl">
-            Discover the latest trends in women's fashion. Elegant, stylish, and
-            designed for the modern woman.
+            Discover the latest trends in women&apos;s fashion. Elegant,
+            stylish, and designed for the modern woman.
           </p>
         </div>
       </div>
@@ -107,14 +107,14 @@ export default function Women() {
               products
             </p>
             <div className="flex gap-4">
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-700">
                 <option>All Categories</option>
                 <option>Dresses</option>
                 <option>Tops</option>
                 <option>Denim</option>
                 <option>Accessories</option>
               </select>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-700">
                 <option>Sort by: Featured</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>

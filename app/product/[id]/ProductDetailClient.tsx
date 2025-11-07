@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/app/components/ProductCard";
 import { useWishlist } from "@/app/context/WishlistContext";
+import { useCart } from "@/app/context/CartContext";
 
 interface ProductImage {
   public_id: string;
@@ -41,16 +42,20 @@ export default function ProductDetailClient({
   );
 
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const inWishlist = isInWishlist(product._id);
 
   const handleAddToCart = () => {
-    // TODO: Implement cart functionality
-    console.log("Add to cart:", {
-      product: product._id,
-      size: selectedSize,
-      color: selectedColor,
-      quantity,
-    });
+    addToCart(
+      {
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.images?.[0]?.url || "",
+        category: product.category,
+      },
+      quantity
+    );
   };
 
   const handleToggleWishlist = () => {

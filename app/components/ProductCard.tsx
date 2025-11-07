@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useWishlist } from "@/app/context/WishlistContext";
+import { useCart } from "@/app/context/CartContext";
 
 interface ProductCardProps {
   id: string | number;
@@ -26,6 +27,7 @@ export default function ProductCard({
   reviews,
 }: ProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const inWishlist = isInWishlist(String(id));
 
   const discount = originalPrice
@@ -47,6 +49,19 @@ export default function ProductCard({
         category,
       });
     }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    addToCart({
+      _id: String(id),
+      name,
+      price,
+      image,
+      category,
+    });
   };
 
   return (
@@ -141,7 +156,10 @@ export default function ProductCard({
         </div>
       </Link>
       <div className="px-4 pb-4">
-        <button className="w-full bg-rose-600 text-white py-2 rounded-lg hover:bg-rose-700 transition font-medium">
+        <button
+          onClick={handleAddToCart}
+          className="w-full bg-rose-600 text-white py-2 rounded-lg hover:bg-rose-700 transition font-medium"
+        >
           Add to Cart
         </button>
       </div>

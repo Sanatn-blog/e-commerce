@@ -108,14 +108,14 @@ export default function NewArrivals() {
               products
             </p>
             <div className="flex gap-4">
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-gray-700">
                 <option>All Categories</option>
                 <option>Electronics</option>
                 <option>Clothing</option>
                 <option>Accessories</option>
                 <option>Lifestyle</option>
               </select>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-gray-700">
                 <option>Sort by: Latest</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>

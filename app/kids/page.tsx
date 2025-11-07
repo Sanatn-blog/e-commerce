@@ -86,10 +86,10 @@ export default function Kids() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
 
-      <div className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-16">
+      <div className="bg-linear-to-r from-orange-500 to-yellow-500 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Kids' Collection
+            Kids&apos; Collection
           </h1>
           <p className="text-lg md:text-xl text-orange-100 max-w-2xl">
             Fun, comfortable, and durable clothing for your little ones. Let
@@ -107,14 +107,14 @@ export default function Kids() {
               products
             </p>
             <div className="flex gap-4">
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
                 <option>All Categories</option>
                 <option>Tops</option>
                 <option>Bottoms</option>
                 <option>Outerwear</option>
                 <option>Accessories</option>
               </select>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
                 <option>Sort by: Featured</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>

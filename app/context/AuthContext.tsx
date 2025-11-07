@@ -13,6 +13,7 @@ interface Customer {
   phone: string;
   name?: string;
   email?: string;
+  image?: string;
   isVerified: boolean;
 }
 

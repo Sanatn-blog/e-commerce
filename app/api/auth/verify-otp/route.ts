@@ -41,13 +41,14 @@ export async function POST(request: NextRequest) {
     customer.otp = undefined;
     customer.otpExpiry = undefined;
 
+    // Only update name if provided (for backward compatibility)
     if (name && !customer.name) {
       customer.name = name;
     }
 
     await customer.save();
 
-    // Create session
+    // Create session (even if name is not set yet)
     const token = await createCustomerToken({
       customerId: customer._id.toString(),
       phone: customer.phone,

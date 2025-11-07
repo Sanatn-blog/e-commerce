@@ -23,7 +23,7 @@ export default function WishlistPage() {
                 {wishlist.length} items saved
               </p>
             </div>
-            <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700">
               <Share2 size={20} />
               <span>Share Wishlist</span>
             </button>

@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import {
@@ -8,9 +10,100 @@ import {
   CreditCard,
   Settings,
   LogOut,
+  Camera,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import ImageCropModal from "../components/ImageCropModal";
 
 export default function AccountPage() {
+  const { customer, loading, logout, refreshCustomer } = useAuth();
+  const { success, error } = useToast();
+  const router = useRouter();
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!loading && !customer) {
+      router.push("/login");
+    }
+  }, [customer, loading, router]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+        setShowCropModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCropComplete = async (croppedImage: string) => {
+    setShowCropModal(false);
+    setUploading(true);
+
+    try {
+      const response = await fetch("/api/customer/upload-profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image: croppedImage }),
+      });
+
+      if (response.ok) {
+        await refreshCustomer();
+        success("Profile image updated successfully!");
+      } else {
+        error("Failed to upload image. Please try again.");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      error("Failed to upload image. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navbar />
+        <main className="grow py-12 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!customer) {
+    return null;
+  }
+
+  const profileImage = (customer as any).image || null;
+  const getInitials = () => {
+    if (customer.name) {
+      return customer.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return customer.phone.slice(0, 2);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
@@ -23,12 +116,45 @@ export default function AccountPage() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex items-center space-x-4 mb-6 pb-6 border-b">
-                  <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                    JD
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-full shrink-0 overflow-hidden bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                      {uploading ? (
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                      ) : profileImage ? (
+                        <img
+                          src={profileImage}
+                          alt={customer.name || "Profile"}
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        getInitials()
+                      )}
+                    </div>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 transition shadow-lg disabled:opacity-50"
+                    >
+                      <Camera size={14} />
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
                   </div>
-                  <div>
-                    <h2 className="font-semibold text-gray-900">John Doe</h2>
-                    <p className="text-sm text-gray-500">john@example.com</p>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-semibold text-gray-900 truncate">
+                      {customer.name || "User"}
+                    </h2>
+                    <p
+                      className="text-sm text-gray-500 truncate"
+                      title={customer.email || customer.phone}
+                    >
+                      {customer.email || customer.phone}
+                    </p>
                   </div>
                 </div>
 
@@ -75,7 +201,10 @@ export default function AccountPage() {
                     <Settings size={20} />
                     <span>Settings</span>
                   </a>
-                  <button className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full">
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full"
+                  >
                     <LogOut size={20} />
                     <span>Logout</span>
                   </button>
@@ -98,33 +227,11 @@ export default function AccountPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      First Name
+                      Full Name
                     </label>
                     <input
                       type="text"
-                      value="John"
-                      readOnly
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value="Doe"
-                      readOnly
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value="john@example.com"
+                      value={customer.name || "Not provided"}
                       readOnly
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
                     />
@@ -135,7 +242,18 @@ export default function AccountPage() {
                     </label>
                     <input
                       type="tel"
-                      value="+1 (555) 123-4567"
+                      value={customer.phone}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={customer.email || "Not provided"}
                       readOnly
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
                     />
@@ -238,6 +356,13 @@ export default function AccountPage() {
         </div>
       </main>
       <Footer />
+      {showCropModal && selectedImage && (
+        <ImageCropModal
+          image={selectedImage}
+          onCropComplete={handleCropComplete}
+          onClose={() => setShowCropModal(false)}
+        />
+      )}
     </div>
   );
 }

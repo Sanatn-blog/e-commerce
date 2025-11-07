@@ -4,6 +4,7 @@ export interface ICustomer extends Document {
   phone: string;
   name?: string;
   email?: string;
+  image?: string;
   otp?: string;
   otpExpiry?: Date;
   isVerified: boolean;
@@ -26,6 +27,9 @@ const CustomerSchema: Schema = new Schema({
     type: String,
     lowercase: true,
     trim: true,
+  },
+  image: {
+    type: String,
   },
   otp: {
     type: String,
