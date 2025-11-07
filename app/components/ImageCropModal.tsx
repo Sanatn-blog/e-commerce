@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import { X, Check } from "lucide-react";
+import type { Area, Point } from "react-easy-crop";
 
 interface ImageCropModalProps {
   image: string;
@@ -15,11 +16,11 @@ export default function ImageCropModal({
   onCropComplete,
   onClose,
 }: ImageCropModalProps) {
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
-  const onCropChange = (crop: any) => {
+  const onCropChange = (crop: Point) => {
     setCrop(crop);
   };
 
@@ -28,13 +29,15 @@ export default function ImageCropModal({
   };
 
   const onCropCompleteHandler = useCallback(
-    (croppedArea: any, croppedAreaPixels: any) => {
+    (croppedArea: Area, croppedAreaPixels: Area) => {
       setCroppedAreaPixels(croppedAreaPixels);
     },
     []
   );
 
   const createCroppedImage = async () => {
+    if (!croppedAreaPixels) return;
+
     try {
       const croppedImage = await getCroppedImg(image, croppedAreaPixels);
       onCropComplete(croppedImage);
@@ -107,7 +110,7 @@ export default function ImageCropModal({
 
 async function getCroppedImg(
   imageSrc: string,
-  pixelCrop: any
+  pixelCrop: Area
 ): Promise<string> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
