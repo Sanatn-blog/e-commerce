@@ -1,86 +1,38 @@
 import ProductCard from "../components/ProductCard";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-// Sample new arrivals data
-const newArrivals = [
-  {
-    id: 101,
-    name: "Premium Wireless Headphones",
-    price: 199,
-    originalPrice: 249,
-    image: "/products/headphones.jpg",
-    category: "Electronics",
-    rating: 4.8,
-    reviews: 124,
-  },
-  {
-    id: 102,
-    name: "Minimalist Leather Wallet",
-    price: 49,
-    image: "/products/wallet.jpg",
-    category: "Accessories",
-    rating: 4.6,
-    reviews: 89,
-  },
-  {
-    id: 103,
-    name: "Smart Fitness Watch",
-    price: 299,
-    originalPrice: 399,
-    image: "/products/watch.jpg",
-    category: "Electronics",
-    rating: 4.7,
-    reviews: 203,
-  },
-  {
-    id: 104,
-    name: "Organic Cotton T-Shirt",
-    price: 29,
-    image: "/products/tshirt.jpg",
-    category: "Clothing",
-    rating: 4.5,
-    reviews: 156,
-  },
-  {
-    id: 105,
-    name: "Stainless Steel Water Bottle",
-    price: 35,
-    originalPrice: 45,
-    image: "/products/bottle.jpg",
-    category: "Lifestyle",
-    rating: 4.9,
-    reviews: 312,
-  },
-  {
-    id: 106,
-    name: "Wireless Charging Pad",
-    price: 39,
-    image: "/products/charger.jpg",
-    category: "Electronics",
-    rating: 4.4,
-    reviews: 78,
-  },
-  {
-    id: 107,
-    name: "Canvas Backpack",
-    price: 79,
-    originalPrice: 99,
-    image: "/products/backpack.jpg",
-    category: "Bags",
-    rating: 4.7,
-    reviews: 145,
-  },
-  {
-    id: 108,
-    name: "Bluetooth Speaker",
-    price: 89,
-    image: "/products/speaker.jpg",
-    category: "Electronics",
-    rating: 4.6,
-    reviews: 267,
-  },
-];
+async function getNewArrivals() {
+  try {
+    await connectDB();
+    // Get products from last 30 days, sorted by newest first
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-export default function NewArrivals() {
+    const products = await Product.find({
+      createdAt: { $gte: thirtyDaysAgo },
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return products.map((product) => ({
+      id: product._id.toString(),
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images?.[0]?.url || "/placeholder.jpg",
+      category: product.category,
+      rating: 4.5,
+      reviews: 0,
+    }));
+  } catch (error) {
+    console.error("Error fetching new arrivals:", error);
+    return [];
+  }
+}
+
+export default async function NewArrivals() {
+  const newArrivals = await getNewArrivals();
   return (
     <>
       {/* Hero Section */}

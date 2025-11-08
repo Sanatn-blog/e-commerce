@@ -28,12 +28,27 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitStatus(null);
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setSubmitStatus("success");
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        setSubmitStatus("error");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      setSubmitStatus("error");
+    } finally {
       setIsSubmitting(false);
-      setSubmitStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    }, 1000);
+    }
   };
 
   return (
@@ -62,6 +77,15 @@ export default function ContactPage() {
               </div>
             )}
 
+            {submitStatus === "error" && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-800">
+                  Sorry, there was an error sending your message. Please try
+                  again.
+                </p>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label
@@ -77,7 +101,8 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your full name"
+                  className="text-gray-900 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -95,7 +120,8 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="yourname@example.com"
+                  className="text-gray-900 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -113,7 +139,8 @@ export default function ContactPage() {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="How can we help you?"
+                  className="text-gray-900 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -131,7 +158,8 @@ export default function ContactPage() {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Write your message here..."
+                  className="text-gray-900 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 />
               </div>
 
@@ -189,7 +217,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <h3 className="font-semibold text-gray-900">Phone</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
+                    <p className="text-gray-600">+91 98765 43210</p>
                   </div>
                 </div>
 
@@ -216,9 +244,11 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold text-gray-900">Address</h3>
                     <p className="text-gray-600">
-                      123 Store Street
+                      Shop No. 45, MG Road
                       <br />
-                      City, State 12345
+                      Connaught Place, New Delhi
+                      <br />
+                      Delhi - 110001, India
                     </p>
                   </div>
                 </div>

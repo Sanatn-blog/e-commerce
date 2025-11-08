@@ -1,85 +1,31 @@
 import ProductCard from "../components/ProductCard";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-const menProducts = [
-  {
-    id: 201,
-    name: "Classic Denim Jacket",
-    price: 89,
-    originalPrice: 120,
-    image: "/products/men-jacket.jpg",
-    category: "Outerwear",
-    rating: 4.7,
-    reviews: 189,
-  },
-  {
-    id: 202,
-    name: "Slim Fit Chinos",
-    price: 59,
-    image: "/products/men-chinos.jpg",
-    category: "Pants",
-    rating: 4.5,
-    reviews: 234,
-  },
-  {
-    id: 203,
-    name: "Cotton Polo Shirt",
-    price: 39,
-    originalPrice: 55,
-    image: "/products/men-polo.jpg",
-    category: "Shirts",
-    rating: 4.6,
-    reviews: 312,
-  },
-  {
-    id: 204,
-    name: "Leather Belt",
-    price: 45,
-    image: "/products/men-belt.jpg",
-    category: "Accessories",
-    rating: 4.8,
-    reviews: 156,
-  },
-  {
-    id: 205,
-    name: "Casual Sneakers",
-    price: 79,
-    originalPrice: 99,
-    image: "/products/men-sneakers.jpg",
-    category: "Footwear",
-    rating: 4.7,
-    reviews: 421,
-  },
-  {
-    id: 206,
-    name: "Wool Sweater",
-    price: 69,
-    image: "/products/men-sweater.jpg",
-    category: "Knitwear",
-    rating: 4.9,
-    reviews: 178,
-  },
-  {
-    id: 207,
-    name: "Oxford Dress Shirt",
-    price: 49,
-    originalPrice: 65,
-    image: "/products/men-oxford.jpg",
-    category: "Shirts",
-    rating: 4.6,
-    reviews: 267,
-  },
-  {
-    id: 208,
-    name: "Athletic Joggers",
-    price: 55,
-    image: "/products/men-joggers.jpg",
-    category: "Activewear",
-    rating: 4.5,
-    reviews: 198,
-  },
-];
+async function getMenProducts() {
+  try {
+    await connectDB();
+    const products = await Product.find({ category: "men" })
+      .sort({ createdAt: -1 })
+      .lean();
+    return products.map((product) => ({
+      id: product._id.toString(),
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images?.[0]?.url || "/placeholder.jpg",
+      category: product.category,
+      rating: 4.5,
+      reviews: 0,
+    }));
+  } catch (error) {
+    console.error("Error fetching men products:", error);
+    return [];
+  }
+}
 
-export default function Men() {
+export default async function Men() {
+  const menProducts = await getMenProducts();
   return (
     <>
       <div className="bg-linear-to-r from-blue-600 to-indigo-600 text-white py-16">

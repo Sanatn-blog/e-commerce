@@ -1,89 +1,35 @@
 import ProductCard from "../components/ProductCard";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-const saleProducts = [
-  {
-    id: 701,
-    name: "Winter Coat",
-    price: 99,
-    originalPrice: 199,
-    image: "/products/winter-coat.jpg",
-    category: "Outerwear",
-    rating: 4.8,
-    reviews: 456,
-  },
-  {
-    id: 702,
-    name: "Designer Jeans",
-    price: 49,
-    originalPrice: 89,
-    image: "/products/designer-jeans.jpg",
-    category: "Denim",
-    rating: 4.7,
-    reviews: 678,
-  },
-  {
-    id: 703,
-    name: "Leather Jacket",
-    price: 149,
-    originalPrice: 299,
-    image: "/products/leather-jacket.jpg",
-    category: "Outerwear",
-    rating: 4.9,
-    reviews: 234,
-  },
-  {
-    id: 704,
-    name: "Formal Dress Shoes",
-    price: 79,
-    originalPrice: 140,
-    image: "/products/dress-shoes.jpg",
-    category: "Footwear",
-    rating: 4.6,
-    reviews: 312,
-  },
-  {
-    id: 705,
-    name: "Cashmere Sweater",
-    price: 69,
-    originalPrice: 120,
-    image: "/products/cashmere-sweater.jpg",
-    category: "Knitwear",
-    rating: 4.8,
-    reviews: 189,
-  },
-  {
-    id: 706,
-    name: "Designer Handbag",
-    price: 159,
-    originalPrice: 320,
-    image: "/products/designer-handbag.jpg",
-    category: "Bags",
-    rating: 4.9,
-    reviews: 567,
-  },
-  {
-    id: 707,
-    name: "Smart Watch",
-    price: 199,
-    originalPrice: 349,
-    image: "/products/smart-watch.jpg",
-    category: "Electronics",
-    rating: 4.7,
-    reviews: 892,
-  },
-  {
-    id: 708,
-    name: "Sunglasses Collection",
-    price: 89,
-    originalPrice: 180,
-    image: "/products/sunglasses-sale.jpg",
-    category: "Accessories",
-    rating: 4.8,
-    reviews: 421,
-  },
-];
+async function getSaleProducts() {
+  try {
+    await connectDB();
+    // Get products that have originalPrice set (indicating they're on sale)
+    const products = await Product.find({
+      originalPrice: { $exists: true, $ne: null },
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
-export default function Sale() {
+    return products.map((product) => ({
+      id: product._id.toString(),
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images?.[0]?.url || "/placeholder.jpg",
+      category: product.category,
+      rating: 4.5,
+      reviews: 0,
+    }));
+  } catch (error) {
+    console.error("Error fetching sale products:", error);
+    return [];
+  }
+}
+
+export default async function Sale() {
+  const saleProducts = await getSaleProducts();
   return (
     <>
       <div className="bg-linear-to-r from-red-600 to-orange-600 text-white py-16">

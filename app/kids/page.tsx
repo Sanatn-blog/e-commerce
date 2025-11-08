@@ -1,85 +1,31 @@
 import ProductCard from "../components/ProductCard";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-const kidsProducts = [
-  {
-    id: 401,
-    name: "Cartoon Print T-Shirt",
-    price: 19,
-    originalPrice: 29,
-    image: "/products/kids-tshirt.jpg",
-    category: "Tops",
-    rating: 4.7,
-    reviews: 234,
-  },
-  {
-    id: 402,
-    name: "Denim Overalls",
-    price: 39,
-    image: "/products/kids-overalls.jpg",
-    category: "Bottoms",
-    rating: 4.8,
-    reviews: 189,
-  },
-  {
-    id: 403,
-    name: "Colorful Sneakers",
-    price: 45,
-    originalPrice: 60,
-    image: "/products/kids-sneakers.jpg",
-    category: "Footwear",
-    rating: 4.6,
-    reviews: 312,
-  },
-  {
-    id: 404,
-    name: "Hooded Jacket",
-    price: 49,
-    image: "/products/kids-jacket.jpg",
-    category: "Outerwear",
-    rating: 4.9,
-    reviews: 156,
-  },
-  {
-    id: 405,
-    name: "Cotton Shorts Set",
-    price: 29,
-    originalPrice: 40,
-    image: "/products/kids-shorts.jpg",
-    category: "Sets",
-    rating: 4.5,
-    reviews: 267,
-  },
-  {
-    id: 406,
-    name: "School Backpack",
-    price: 35,
-    image: "/products/kids-backpack.jpg",
-    category: "Accessories",
-    rating: 4.8,
-    reviews: 421,
-  },
-  {
-    id: 407,
-    name: "Printed Dress",
-    price: 34,
-    originalPrice: 48,
-    image: "/products/kids-dress.jpg",
-    category: "Dresses",
-    rating: 4.7,
-    reviews: 198,
-  },
-  {
-    id: 408,
-    name: "Sports Cap",
-    price: 15,
-    image: "/products/kids-cap.jpg",
-    category: "Accessories",
-    rating: 4.6,
-    reviews: 145,
-  },
-];
+async function getKidsProducts() {
+  try {
+    await connectDB();
+    const products = await Product.find({ category: "kids" })
+      .sort({ createdAt: -1 })
+      .lean();
+    return products.map((product) => ({
+      id: product._id.toString(),
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images?.[0]?.url || "/placeholder.jpg",
+      category: product.category,
+      rating: 4.5,
+      reviews: 0,
+    }));
+  } catch (error) {
+    console.error("Error fetching kids products:", error);
+    return [];
+  }
+}
 
-export default function Kids() {
+export default async function Kids() {
+  const kidsProducts = await getKidsProducts();
   return (
     <>
       <div className="bg-linear-to-r from-orange-500 to-yellow-500 text-white py-16">

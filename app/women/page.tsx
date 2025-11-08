@@ -1,85 +1,31 @@
 import ProductCard from "../components/ProductCard";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-const womenProducts = [
-  {
-    id: 301,
-    name: "Floral Summer Dress",
-    price: 79,
-    originalPrice: 110,
-    image: "/products/women-dress.jpg",
-    category: "Dresses",
-    rating: 4.8,
-    reviews: 342,
-  },
-  {
-    id: 302,
-    name: "High-Waisted Jeans",
-    price: 69,
-    image: "/products/women-jeans.jpg",
-    category: "Denim",
-    rating: 4.7,
-    reviews: 456,
-  },
-  {
-    id: 303,
-    name: "Silk Blouse",
-    price: 59,
-    originalPrice: 85,
-    image: "/products/women-blouse.jpg",
-    category: "Tops",
-    rating: 4.9,
-    reviews: 289,
-  },
-  {
-    id: 304,
-    name: "Leather Handbag",
-    price: 129,
-    image: "/products/women-handbag.jpg",
-    category: "Bags",
-    rating: 4.8,
-    reviews: 234,
-  },
-  {
-    id: 305,
-    name: "Ankle Boots",
-    price: 99,
-    originalPrice: 140,
-    image: "/products/women-boots.jpg",
-    category: "Footwear",
-    rating: 4.6,
-    reviews: 378,
-  },
-  {
-    id: 306,
-    name: "Cashmere Cardigan",
-    price: 89,
-    image: "/products/women-cardigan.jpg",
-    category: "Knitwear",
-    rating: 4.9,
-    reviews: 167,
-  },
-  {
-    id: 307,
-    name: "Pleated Midi Skirt",
-    price: 55,
-    originalPrice: 75,
-    image: "/products/women-skirt.jpg",
-    category: "Skirts",
-    rating: 4.7,
-    reviews: 298,
-  },
-  {
-    id: 308,
-    name: "Statement Necklace",
-    price: 39,
-    image: "/products/women-necklace.jpg",
-    category: "Jewelry",
-    rating: 4.5,
-    reviews: 145,
-  },
-];
+async function getWomenProducts() {
+  try {
+    await connectDB();
+    const products = await Product.find({ category: "women" })
+      .sort({ createdAt: -1 })
+      .lean();
+    return products.map((product) => ({
+      id: product._id.toString(),
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images?.[0]?.url || "/placeholder.jpg",
+      category: product.category,
+      rating: 4.5,
+      reviews: 0,
+    }));
+  } catch (error) {
+    console.error("Error fetching women products:", error);
+    return [];
+  }
+}
 
-export default function Women() {
+export default async function Women() {
+  const womenProducts = await getWomenProducts();
   return (
     <>
       <div className="bg-linear-to-r from-pink-600 to-purple-600 text-white py-16">
