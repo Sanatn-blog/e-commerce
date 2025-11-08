@@ -129,9 +129,13 @@ const categoryIcons: Record<string, { icon: JSX.Element; color: string }> = {
 export default function CategoryGrid({ categories }: CategoryGridProps) {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
-  const handleImageError = (categoryId: string) => {
+  const handleImageError = (categoryId: string, imageUrl: string) => {
+    console.error(`Failed to load image for category ${categoryId}:`, imageUrl);
     setImageErrors((prev) => new Set(prev).add(categoryId));
   };
+
+  // Debug: Log categories data
+  console.log("CategoryGrid categories:", categories);
 
   return (
     <section className="py-12">
@@ -160,32 +164,43 @@ export default function CategoryGrid({ categories }: CategoryGridProps) {
           };
 
           const hasValidImage =
-            category.image && !imageErrors.has(category._id);
+            category.image &&
+            category.image.trim() !== "" &&
+            !imageErrors.has(category._id);
 
           return (
             <Link
               key={category._id}
               href={`/${category.slug}`}
               className={`${
-                hasValidImage ? "bg-white text-gray-900" : categoryStyle.color
-              } rounded-xl p-6 text-center hover:shadow-lg transition-all hover:scale-105 overflow-hidden`}
+                hasValidImage
+                  ? "bg-white text-gray-900 p-0"
+                  : `${categoryStyle.color} p-6`
+              } rounded-xl text-center hover:shadow-lg transition-all hover:scale-105 overflow-hidden relative`}
             >
               {hasValidImage ? (
-                <div className="mb-3 relative w-full h-24 mx-auto">
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                    className="object-cover rounded-lg"
-                    unoptimized
-                    onError={() => handleImageError(category._id)}
-                  />
-                </div>
+                <>
+                  <div className="relative w-full h-32">
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                      className="object-cover"
+                      unoptimized
+                      onError={() =>
+                        handleImageError(category._id, category.image)
+                      }
+                    />
+                  </div>
+                  <h3 className="font-semibold py-3 px-2">{category.name}</h3>
+                </>
               ) : (
-                <div className="mb-3">{categoryStyle.icon}</div>
+                <>
+                  <div className="mb-3">{categoryStyle.icon}</div>
+                  <h3 className="font-semibold">{category.name}</h3>
+                </>
               )}
-              <h3 className="font-semibold">{category.name}</h3>
             </Link>
           );
         })}

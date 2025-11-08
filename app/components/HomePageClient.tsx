@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "./AuthModal";
 import Hero from "./Hero";
+import Carousel from "./Carousel";
 import CategoryGrid from "./CategoryGrid";
 import FeaturedProducts from "./FeaturedProducts";
 import PromoSection from "./PromoSection";
@@ -19,14 +20,26 @@ interface Category {
   order: number;
 }
 
+interface CarouselItem {
+  _id: string;
+  title: string;
+  subtitle?: string;
+  image: string;
+  link?: string;
+  order: number;
+  isActive: boolean;
+}
+
 interface HomePageClientProps {
   products: any[];
   categories: Category[];
+  carousels: CarouselItem[];
 }
 
 export default function HomePageClient({
   products,
   categories,
+  carousels,
 }: HomePageClientProps) {
   const { customer, loading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -49,7 +62,7 @@ export default function HomePageClient({
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
       />
-      <Hero />
+      {carousels.length > 0 ? <Carousel items={carousels} /> : <Hero />}
       <main className="grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CategoryGrid categories={categories} />

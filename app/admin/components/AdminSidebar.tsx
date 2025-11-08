@@ -10,6 +10,7 @@ import {
   Settings,
   Tag,
   BarChart3,
+  Image,
 } from "lucide-react";
 
 const menuItems = [
@@ -18,6 +19,7 @@ const menuItems = [
   { icon: ShoppingCart, label: "Orders", href: "/admin/orders" },
   { icon: Users, label: "Customers", href: "/admin/customers" },
   { icon: Tag, label: "Categories", href: "/admin/categories" },
+  { icon: Image, label: "Carousel", href: "/admin/carousel" },
   { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];

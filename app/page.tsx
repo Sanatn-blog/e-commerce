@@ -1,9 +1,13 @@
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import HomePageClient from "./components/HomePageClient";
 import connectDB from "@/lib/mongodb";
 import Product from "@/models/Product";
 import Category from "@/models/Category";
+import Carousel from "@/models/Carousel";
+
+type MongoDocument = {
+  _id: { toString: () => string };
+  [key: string]: unknown;
+};
 
 async function getProducts() {
   try {
@@ -14,12 +18,24 @@ async function getProducts() {
       .lean();
 
     // Convert MongoDB documents to plain objects and serialize dates
-    return products.map((product) => ({
-      ...product,
-      _id: product._id.toString(),
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-    }));
+    return products.map((product) => {
+      const doc = product as unknown as MongoDocument & {
+        images?: Array<{ public_id: string; url: string }>;
+        createdAt: Date;
+        updatedAt: Date;
+      };
+      return {
+        ...doc,
+        _id: doc._id.toString(),
+        images:
+          doc.images?.map((img) => ({
+            public_id: img.public_id,
+            url: img.url,
+          })) || [],
+        createdAt: doc.createdAt.toISOString(),
+        updatedAt: doc.updatedAt.toISOString(),
+      };
+    });
   } catch (error) {
     console.error("Failed to fetch products:", error);
     return [];
@@ -33,16 +49,57 @@ async function getCategories() {
       .sort({ order: 1 })
       .lean();
 
-    return categories.map((category) => ({
-      _id: category._id.toString(),
-      name: category.name,
-      slug: category.slug,
-      description: category.description,
-      image: category.image,
-      order: category.order,
-    }));
+    return categories.map((category) => {
+      const doc = category as unknown as MongoDocument & {
+        name: string;
+        slug: string;
+        description?: string;
+        image?: string;
+        order: number;
+      };
+      return {
+        _id: doc._id.toString(),
+        name: doc.name,
+        slug: doc.slug,
+        description: doc.description || "",
+        image: doc.image || "",
+        order: doc.order,
+      };
+    });
   } catch (error) {
     console.error("Failed to fetch categories:", error);
+    return [];
+  }
+}
+
+async function getCarousels() {
+  try {
+    await connectDB();
+    const carousels = await Carousel.find({ isActive: true })
+      .sort({ order: 1 })
+      .lean();
+
+    return carousels.map((carousel) => {
+      const doc = carousel as unknown as MongoDocument & {
+        title: string;
+        subtitle?: string;
+        image?: string;
+        link: string;
+        order: number;
+        isActive: boolean;
+      };
+      return {
+        _id: doc._id.toString(),
+        title: doc.title,
+        subtitle: doc.subtitle,
+        image: doc.image || "",
+        link: doc.link,
+        order: doc.order,
+        isActive: doc.isActive,
+      };
+    });
+  } catch (error) {
+    console.error("Failed to fetch carousels:", error);
     return [];
   }
 }
@@ -50,12 +107,13 @@ async function getCategories() {
 export default async function Home() {
   const products = await getProducts();
   const categories = await getCategories();
+  const carousels = await getCarousels();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      <HomePageClient products={products} categories={categories} />
-      <Footer />
-    </div>
+    <HomePageClient
+      products={products}
+      categories={categories}
+      carousels={carousels}
+    />
   );
 }

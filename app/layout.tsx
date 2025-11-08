@@ -5,6 +5,7 @@ import { WishlistProvider } from "./context/WishlistContext";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
+import ConditionalLayout from "./components/ConditionalLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +35,9 @@ export default function RootLayout({
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
-              <WishlistProvider>{children}</WishlistProvider>
+              <WishlistProvider>
+                <ConditionalLayout>{children}</ConditionalLayout>
+              </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </ToastProvider>

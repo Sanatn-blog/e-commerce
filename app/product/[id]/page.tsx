@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import connectDB from "@/lib/mongodb";
 import Product from "@/models/Product";
-import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/Footer";
 import ProductDetailClient from "./ProductDetailClient";
 
 async function getProduct(id: string) {
@@ -63,15 +61,11 @@ export default async function ProductDetailPage({
   const relatedProducts = await getRelatedProducts(product.category, id);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      <main className="grow">
-        <ProductDetailClient
-          product={product}
-          relatedProducts={relatedProducts}
-        />
-      </main>
-      <Footer />
-    </div>
+    <main className="grow">
+      <ProductDetailClient
+        product={product}
+        relatedProducts={relatedProducts}
+      />
+    </main>
   );
 }

@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { useCart } from "@/app/context/CartContext";
+import { useToast } from "@/app/context/ToastContext";
 
 interface ProductCardProps {
   id: string | number;
@@ -28,7 +30,9 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { success } = useToast();
   const inWishlist = isInWishlist(String(id));
+  const [isAdding, setIsAdding] = useState(false);
 
   const discount = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
@@ -55,6 +59,8 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
+    setIsAdding(true);
+
     addToCart({
       _id: String(id),
       name,
@@ -62,6 +68,12 @@ export default function ProductCard({
       image,
       category,
     });
+
+    success(`${name} added to cart!`);
+
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 600);
   };
 
   return (
@@ -146,10 +158,10 @@ export default function ProductCard({
             <span className="text-xs text-gray-500 ml-2">({reviews})</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-gray-900">${price}</span>
+            <span className="text-xl font-bold text-gray-900">₹{price}</span>
             {originalPrice && (
               <span className="text-sm text-gray-500 line-through">
-                ${originalPrice}
+                ₹{originalPrice}
               </span>
             )}
           </div>
@@ -158,9 +170,67 @@ export default function ProductCard({
       <div className="px-4 pb-4">
         <button
           onClick={handleAddToCart}
-          className="w-full bg-rose-600 text-white py-2 rounded-lg hover:bg-rose-700 transition font-medium"
+          disabled={isAdding}
+          className={`
+            w-full bg-rose-600 text-white py-2 rounded-lg font-medium
+            relative overflow-hidden
+            transition-all duration-300 ease-out
+            hover:bg-rose-700 hover:shadow-lg hover:-translate-y-0.5
+            active:scale-95 active:shadow-md
+            disabled:cursor-not-allowed
+            ${isAdding ? "scale-95 bg-rose-700" : ""}
+          `}
         >
-          Add to Cart
+          <span
+            className={`inline-flex items-center gap-2 transition-all duration-300 ${
+              isAdding ? "scale-110" : ""
+            }`}
+          >
+            {isAdding ? (
+              <>
+                <svg
+                  className="w-5 h-5 animate-bounce"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                Added!
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-5 h-5 transition-transform group-hover:scale-110"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                Add to Cart
+              </>
+            )}
+          </span>
+          {isAdding && (
+            <span
+              className="absolute inset-0 bg-white/20 animate-ping rounded-lg"
+              style={{
+                animationDuration: "0.6s",
+                animationIterationCount: "1",
+              }}
+            />
+          )}
         </button>
       </div>
     </div>

@@ -25,7 +25,7 @@ async function displayProducts() {
       console.log(`\n${index + 1}. ${product.name}`);
       console.log(`   ID: ${product._id}`);
       console.log(`   Category: ${product.category}`);
-      console.log(`   Price: $${product.price}`);
+      console.log(`   Price: ₹${product.price}`);
       console.log(`   Stock: ${product.stock}`);
       console.log(`   Description: ${product.description}`);
       if (product.sizes && product.sizes.length > 0) {

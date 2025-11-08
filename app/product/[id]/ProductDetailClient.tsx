@@ -6,6 +6,7 @@ import Link from "next/link";
 import ProductCard from "@/app/components/ProductCard";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { useCart } from "@/app/context/CartContext";
+import { useToast } from "@/app/context/ToastContext";
 
 interface ProductImage {
   public_id: string;
@@ -43,6 +44,7 @@ export default function ProductDetailClient({
 
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const { success } = useToast();
   const inWishlist = isInWishlist(product._id);
 
   const handleAddToCart = () => {
@@ -53,9 +55,23 @@ export default function ProductDetailClient({
         price: product.price,
         image: product.images?.[0]?.url || "",
         category: product.category,
+        size: selectedSize || undefined,
+        color: selectedColor || undefined,
       },
       quantity
     );
+
+    // Build success message with details
+    let message = `${quantity} ${product.name}`;
+    if (selectedSize || selectedColor) {
+      const details = [];
+      if (selectedSize) details.push(`Size: ${selectedSize}`);
+      if (selectedColor) details.push(`Color: ${selectedColor}`);
+      message += ` (${details.join(", ")})`;
+    }
+    message += " added to cart!";
+
+    success(message);
   };
 
   const handleToggleWishlist = () => {
@@ -180,7 +196,7 @@ export default function ProductDetailClient({
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-6">
               <span className="text-4xl font-bold text-gray-900">
-                ${product.price}
+                ₹{product.price}
               </span>
             </div>
 
@@ -321,7 +337,7 @@ export default function ProductDetailClient({
                   d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
                 />
               </svg>
-              <span>Free shipping on orders over $50</span>
+              <span>Free shipping on orders over ₹500</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <svg

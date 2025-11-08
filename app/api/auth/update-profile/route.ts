@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCustomerSession } from "@/lib/customerAuth";
 import connectDB from "@/lib/mongodb";
 import Customer from "@/models/Customer";
-import { getCustomerSession } from "@/lib/customerAuth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email } = await request.json();
-
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    }
-
-    // Get current customer from session
     const session = await getCustomerSession();
+
     if (!session) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { email, address, address2, city, state, zipCode, landmark } =
+      await request.json();
 
     await connectDB();
 
@@ -29,10 +26,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Update customer profile
-    customer.name = name;
-    if (email) {
-      customer.email = email;
-    }
+    if (email) customer.email = email;
+    if (address) customer.address = address;
+    if (address2 !== undefined) customer.address2 = address2;
+    if (city) customer.city = city;
+    if (state) customer.state = state;
+    if (zipCode) customer.zipCode = zipCode;
+    if (landmark !== undefined) customer.landmark = landmark;
 
     await customer.save();
 

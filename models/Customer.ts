@@ -5,6 +5,12 @@ export interface ICustomer extends Document {
   name?: string;
   email?: string;
   image?: string;
+  address?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  landmark?: string;
   otp?: string;
   otpExpiry?: Date;
   isVerified: boolean;
@@ -30,6 +36,30 @@ const CustomerSchema: Schema = new Schema({
   },
   image: {
     type: String,
+  },
+  address: {
+    type: String,
+    trim: true,
+  },
+  address2: {
+    type: String,
+    trim: true,
+  },
+  city: {
+    type: String,
+    trim: true,
+  },
+  state: {
+    type: String,
+    trim: true,
+  },
+  zipCode: {
+    type: String,
+    trim: true,
+  },
+  landmark: {
+    type: String,
+    trim: true,
   },
   otp: {
     type: String,

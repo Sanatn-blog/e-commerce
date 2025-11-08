@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import {
   User,
   Package,
@@ -23,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import ImageCropModal from "../components/ImageCropModal";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Address {
   _id: string;
@@ -227,16 +226,12 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
-        <Navbar />
-        <main className="grow py-12 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <main className="grow py-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </main>
     );
   }
 
@@ -272,502 +267,491 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
-      <main className="grow py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
+    <main className="grow py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex items-center space-x-4 mb-6 pb-6 border-b">
-                  <div className="relative">
-                    {uploading ? (
-                      <div className="w-16 h-16 rounded-full shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                      </div>
-                    ) : customer.image ? (
-                      <div className="w-16 h-16 rounded-full shrink-0 overflow-hidden relative">
-                        <img
-                          key={customer.image}
-                          src={`${customer.image}?t=${Date.now()}`}
-                          alt={customer.name || "Profile"}
-                          className="w-full h-full object-cover"
-                          onLoad={() =>
-                            console.log(
-                              "Image loaded successfully:",
-                              customer.image
-                            )
-                          }
-                          onError={(e) => {
-                            console.error(
-                              "Image failed to load:",
-                              customer.image
-                            );
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-16 h-16 rounded-full shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
-                        {getInitials()}
-                      </div>
-                    )}
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                      className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 transition shadow-lg disabled:opacity-50"
-                    >
-                      <Camera size={14} />
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="font-semibold text-gray-900 truncate">
-                      {customer.name || "User"}
-                    </h2>
-                    <p
-                      className="text-sm text-gray-500 truncate"
-                      title={customer.email || customer.phone}
-                    >
-                      {customer.email || customer.phone}
-                    </p>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex items-center space-x-4 mb-6 pb-6 border-b">
+                <div className="relative">
+                  {uploading ? (
+                    <div className="w-16 h-16 rounded-full shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                    </div>
+                  ) : customer.image ? (
+                    <div className="w-16 h-16 rounded-full shrink-0 overflow-hidden relative">
+                      <Image
+                        key={customer.image}
+                        src={`${customer.image}?t=${Date.now()}`}
+                        alt={customer.name || "Profile"}
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-cover"
+                        onLoad={() =>
+                          console.log(
+                            "Image loaded successfully:",
+                            customer.image
+                          )
+                        }
+                        onError={(e) => {
+                          console.error(
+                            "Image failed to load:",
+                            customer.image
+                          );
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 rounded-full shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                      {getInitials()}
+                    </div>
+                  )}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full hover:bg-blue-700 transition shadow-lg disabled:opacity-50"
+                  >
+                    <Camera size={14} />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
                 </div>
-
-                <nav className="space-y-2">
-                  <button
-                    onClick={() => setActiveSection("profile")}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                      activeSection === "profile"
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-semibold text-gray-900 truncate">
+                    {customer.name || "User"}
+                  </h2>
+                  <p
+                    className="text-sm text-gray-500 truncate"
+                    title={customer.email || customer.phone}
                   >
-                    <User size={20} />
-                    <span>Profile</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("orders")}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                      activeSection === "orders"
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Package size={20} />
-                    <span>Orders</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("wishlist")}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                      activeSection === "wishlist"
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Heart size={20} />
-                    <span>Wishlist</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("addresses")}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                      activeSection === "addresses"
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <MapPin size={20} />
-                    <span>Addresses</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("payment")}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                      activeSection === "payment"
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <CreditCard size={20} />
-                    <span>Payment Methods</span>
-                  </button>
-                  <button
-                    onClick={() => setActiveSection("settings")}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                      activeSection === "settings"
-                        ? "bg-blue-50 text-blue-600 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Settings size={20} />
-                    <span>Settings</span>
-                  </button>
-                  <button
-                    onClick={logout}
-                    className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full"
-                  >
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                  </button>
-                </nav>
+                    {customer.email || customer.phone}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Main Content */}
-            <div className="lg:col-span-3">
-              {/* Profile Section */}
-              {activeSection === "profile" && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      Profile Information
-                    </h2>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        value={customer.name || "Not provided"}
-                        readOnly
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone
-                      </label>
-                      <input
-                        type="tel"
-                        value={customer.phone}
-                        readOnly
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        value={customer.email || "Not provided"}
-                        readOnly
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Orders Section */}
-              {activeSection === "orders" && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                    My Orders
-                  </h2>
-                  {loadingOrders ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="mt-4 text-gray-600">Loading orders...</p>
-                    </div>
-                  ) : orders.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Package
-                        size={48}
-                        className="mx-auto text-gray-400 mb-4"
-                      />
-                      <p className="text-gray-600">No orders yet</p>
-                      <button
-                        onClick={() => router.push("/")}
-                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      >
-                        Start Shopping
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {orders.map((order) => (
-                        <div
-                          key={order._id}
-                          className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
-                        >
-                          <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <p className="font-semibold text-gray-900">
-                                Order #{order.orderNumber}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                {new Date(order.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <span
-                              className={`px-3 py-1 text-sm font-medium rounded-full capitalize ${getStatusColor(
-                                order.status
-                              )}`}
-                            >
-                              {order.status}
-                            </span>
-                          </div>
-                          <div className="space-y-3">
-                            {order.items.map((item, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center space-x-4"
-                              >
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-16 h-16 object-cover rounded-lg"
-                                />
-                                <div className="flex-1">
-                                  <p className="text-gray-900 font-medium">
-                                    {item.name}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    Quantity: {item.quantity}
-                                    {item.size && ` • Size: ${item.size}`}
-                                    {item.color && ` • Color: ${item.color}`}
-                                  </p>
-                                </div>
-                                <p className="font-semibold text-gray-900">
-                                  ${item.price.toFixed(2)}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
-                            <span className="text-gray-600">Total</span>
-                            <span className="text-lg font-bold text-gray-900">
-                              ${order.total.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Addresses Section */}
-              {activeSection === "addresses" && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      My Addresses
-                    </h2>
-                    <button
-                      onClick={() => {
-                        setEditingAddress(null);
-                        setShowAddressModal(true);
-                      }}
-                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      <Plus size={20} />
-                      <span>Add New</span>
-                    </button>
-                  </div>
-                  {loadingAddresses ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                      <p className="mt-4 text-gray-600">Loading addresses...</p>
-                    </div>
-                  ) : addresses.length === 0 ? (
-                    <div className="text-center py-12">
-                      <MapPin
-                        size={48}
-                        className="mx-auto text-gray-400 mb-4"
-                      />
-                      <p className="text-gray-600">No addresses saved</p>
-                      <button
-                        onClick={() => setShowAddressModal(true)}
-                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      >
-                        Add Address
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {addresses.map((address) => (
-                        <div
-                          key={address._id}
-                          className="border border-gray-200 rounded-lg p-4"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            {address.isDefault && (
-                              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
-                                Default
-                              </span>
-                            )}
-                            <div className="flex space-x-2 ml-auto">
-                              <button
-                                onClick={() => {
-                                  setEditingAddress(address);
-                                  setShowAddressModal(true);
-                                }}
-                                className="text-gray-400 hover:text-blue-600"
-                              >
-                                <Edit2 size={16} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteAddress(address._id)}
-                                className="text-gray-400 hover:text-red-600"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </div>
-                          <p className="font-medium text-gray-900 mt-3">
-                            {address.label}
-                          </p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {address.fullName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {address.phone}
-                          </p>
-                          <p className="text-sm text-gray-600 mt-2">
-                            {address.addressLine1}
-                          </p>
-                          {address.addressLine2 && (
-                            <p className="text-sm text-gray-600">
-                              {address.addressLine2}
-                            </p>
-                          )}
-                          <p className="text-sm text-gray-600">
-                            {address.city}, {address.state} {address.zipCode}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {address.country}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Wishlist Section */}
-              {activeSection === "wishlist" && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                      My Wishlist
-                    </h2>
-                    <span className="text-sm text-gray-600">
-                      {wishlist.length}{" "}
-                      {wishlist.length === 1 ? "item" : "items"}
-                    </span>
-                  </div>
-                  {wishlist.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Heart size={48} className="mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-600">Your wishlist is empty</p>
-                      <button
-                        onClick={() => router.push("/")}
-                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                      >
-                        Browse Products
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {wishlist.map((item) => (
-                        <div
-                          key={item._id}
-                          className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
-                        >
-                          <Link href={`/product/${item._id}`}>
-                            <div className="relative aspect-square bg-gray-100">
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </Link>
-                          <div className="p-4">
-                            <Link href={`/product/${item._id}`}>
-                              <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2">
-                                {item.name}
-                              </h3>
-                            </Link>
-                            <p className="text-sm text-gray-500 mb-2">
-                              {item.category}
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <span className="text-lg font-bold text-gray-900">
-                                ${item.price.toFixed(2)}
-                              </span>
-                              <button
-                                onClick={() => {
-                                  removeFromWishlist(item._id);
-                                  success("Removed from wishlist");
-                                }}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                title="Remove from wishlist"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </div>
-                            <Link href={`/product/${item._id}`}>
-                              <button className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                View Product
-                              </button>
-                            </Link>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Payment Methods Section */}
-              {activeSection === "payment" && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                    Payment Methods
-                  </h2>
-                  <div className="text-center py-12">
-                    <CreditCard
-                      size={48}
-                      className="mx-auto text-gray-400 mb-4"
-                    />
-                    <p className="text-gray-600">No payment methods saved</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Settings Section */}
-              {activeSection === "settings" && (
-                <div className="bg-white rounded-lg shadow-sm p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                    Settings
-                  </h2>
-                  <div className="text-center py-12">
-                    <Settings
-                      size={48}
-                      className="mx-auto text-gray-400 mb-4"
-                    />
-                    <p className="text-gray-600">Settings coming soon</p>
-                  </div>
-                </div>
-              )}
+              <nav className="space-y-2">
+                <button
+                  onClick={() => setActiveSection("profile")}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
+                    activeSection === "profile"
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <User size={20} />
+                  <span>Profile</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection("orders")}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
+                    activeSection === "orders"
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Package size={20} />
+                  <span>Orders</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection("wishlist")}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
+                    activeSection === "wishlist"
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Heart size={20} />
+                  <span>Wishlist</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection("addresses")}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
+                    activeSection === "addresses"
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <MapPin size={20} />
+                  <span>Addresses</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection("payment")}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
+                    activeSection === "payment"
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <CreditCard size={20} />
+                  <span>Payment Methods</span>
+                </button>
+                <button
+                  onClick={() => setActiveSection("settings")}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
+                    activeSection === "settings"
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <Settings size={20} />
+                  <span>Settings</span>
+                </button>
+                <button
+                  onClick={logout}
+                  className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full"
+                >
+                  <LogOut size={20} />
+                  <span>Logout</span>
+                </button>
+              </nav>
             </div>
           </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {/* Profile Section */}
+            {activeSection === "profile" && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Profile Information
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={customer.name || "Not provided"}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      value={customer.phone}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={customer.email || "Not provided"}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Orders Section */}
+            {activeSection === "orders" && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                  My Orders
+                </h2>
+                {loadingOrders ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading orders...</p>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package size={48} className="mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600">No orders yet</p>
+                    <button
+                      onClick={() => router.push("/")}
+                      className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Start Shopping
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <div
+                        key={order._id}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <p className="font-semibold text-gray-900">
+                              Order #{order.orderNumber}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <span
+                            className={`px-3 py-1 text-sm font-medium rounded-full capitalize ${getStatusColor(
+                              order.status
+                            )}`}
+                          >
+                            {order.status}
+                          </span>
+                        </div>
+                        <div className="space-y-3">
+                          {order.items.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center space-x-4"
+                            >
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                width={64}
+                                height={64}
+                                className="w-16 h-16 object-cover rounded-lg"
+                              />
+                              <div className="flex-1">
+                                <p className="text-gray-900 font-medium">
+                                  {item.name}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  Quantity: {item.quantity}
+                                  {item.size && ` • Size: ${item.size}`}
+                                  {item.color && ` • Color: ${item.color}`}
+                                </p>
+                              </div>
+                              <p className="font-semibold text-gray-900">
+                                ${item.price.toFixed(2)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
+                          <span className="text-gray-600">Total</span>
+                          <span className="text-lg font-bold text-gray-900">
+                            ${order.total.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Addresses Section */}
+            {activeSection === "addresses" && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    My Addresses
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setEditingAddress(null);
+                      setShowAddressModal(true);
+                    }}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    <Plus size={20} />
+                    <span>Add New</span>
+                  </button>
+                </div>
+                {loadingAddresses ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading addresses...</p>
+                  </div>
+                ) : addresses.length === 0 ? (
+                  <div className="text-center py-12">
+                    <MapPin size={48} className="mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600">No addresses saved</p>
+                    <button
+                      onClick={() => setShowAddressModal(true)}
+                      className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Add Address
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {addresses.map((address) => (
+                      <div
+                        key={address._id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          {address.isDefault && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+                              Default
+                            </span>
+                          )}
+                          <div className="flex space-x-2 ml-auto">
+                            <button
+                              onClick={() => {
+                                setEditingAddress(address);
+                                setShowAddressModal(true);
+                              }}
+                              className="text-gray-400 hover:text-blue-600"
+                            >
+                              <Edit2 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteAddress(address._id)}
+                              className="text-gray-400 hover:text-red-600"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                        <p className="font-medium text-gray-900 mt-3">
+                          {address.label}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {address.fullName}
+                        </p>
+                        <p className="text-sm text-gray-600">{address.phone}</p>
+                        <p className="text-sm text-gray-600 mt-2">
+                          {address.addressLine1}
+                        </p>
+                        {address.addressLine2 && (
+                          <p className="text-sm text-gray-600">
+                            {address.addressLine2}
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600">
+                          {address.city}, {address.state} {address.zipCode}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {address.country}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Wishlist Section */}
+            {activeSection === "wishlist" && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    My Wishlist
+                  </h2>
+                  <span className="text-sm text-gray-600">
+                    {wishlist.length} {wishlist.length === 1 ? "item" : "items"}
+                  </span>
+                </div>
+                {wishlist.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Heart size={48} className="mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600">Your wishlist is empty</p>
+                    <button
+                      onClick={() => router.push("/")}
+                      className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Browse Products
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {wishlist.map((item) => (
+                      <div
+                        key={item._id}
+                        className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                      >
+                        <Link href={`/product/${item._id}`}>
+                          <div className="relative aspect-square bg-gray-100">
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </Link>
+                        <div className="p-4">
+                          <Link href={`/product/${item._id}`}>
+                            <h3 className="font-semibold text-gray-900 mb-1 hover:text-blue-600 line-clamp-2">
+                              {item.name}
+                            </h3>
+                          </Link>
+                          <p className="text-sm text-gray-500 mb-2">
+                            {item.category}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-gray-900">
+                              ${item.price.toFixed(2)}
+                            </span>
+                            <button
+                              onClick={() => {
+                                removeFromWishlist(item._id);
+                                success("Removed from wishlist");
+                              }}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                              title="Remove from wishlist"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                          <Link href={`/product/${item._id}`}>
+                            <button className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                              View Product
+                            </button>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Payment Methods Section */}
+            {activeSection === "payment" && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                  Payment Methods
+                </h2>
+                <div className="text-center py-12">
+                  <CreditCard
+                    size={48}
+                    className="mx-auto text-gray-400 mb-4"
+                  />
+                  <p className="text-gray-600">No payment methods saved</p>
+                </div>
+              </div>
+            )}
+
+            {/* Settings Section */}
+            {activeSection === "settings" && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                  Settings
+                </h2>
+                <div className="text-center py-12">
+                  <Settings size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600">Settings coming soon</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
-      <Footer />
+      </div>
       {showCropModal && selectedImage && (
         <ImageCropModal
           image={selectedImage}
@@ -785,7 +769,7 @@ export default function AccountPage() {
           }}
         />
       )}
-    </div>
+    </main>
   );
 }
 

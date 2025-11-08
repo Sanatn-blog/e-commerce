@@ -1,22 +1,22 @@
 const orders = [
-  { id: "#1234", customer: "John Doe", amount: "$125.00", status: "Completed" },
+  { id: "#1234", customer: "John Doe", amount: "₹125.00", status: "Completed" },
   {
     id: "#1235",
     customer: "Jane Smith",
-    amount: "$89.50",
+    amount: "₹89.50",
     status: "Processing",
   },
   {
     id: "#1236",
     customer: "Bob Johnson",
-    amount: "$210.00",
+    amount: "₹210.00",
     status: "Shipped",
   },
-  { id: "#1237", customer: "Alice Brown", amount: "$45.00", status: "Pending" },
+  { id: "#1237", customer: "Alice Brown", amount: "₹45.00", status: "Pending" },
   {
     id: "#1238",
     customer: "Charlie Wilson",
-    amount: "$156.75",
+    amount: "₹156.75",
     status: "Completed",
   },
 ];
