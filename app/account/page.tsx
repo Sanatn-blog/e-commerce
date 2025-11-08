@@ -94,7 +94,7 @@ export default function AccountPage() {
     } else if (activeSection === "addresses" && addresses.length === 0) {
       fetchAddresses();
     }
-  }, [activeSection]);
+  }, [activeSection, addresses.length, orders.length]);
 
   const fetchOrders = async () => {
     setLoadingOrders(true);
@@ -170,7 +170,7 @@ export default function AccountPage() {
       } else {
         error("Failed to save address");
       }
-    } catch (err) {
+    } catch {
       error("Failed to save address");
     }
   };
@@ -278,7 +278,7 @@ export default function AccountPage() {
               <div className="flex items-center space-x-4 mb-6 pb-6 border-b">
                 <div className="relative">
                   {uploading ? (
-                    <div className="w-16 h-16 rounded-full shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full shrink-0 bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
                     </div>
                   ) : customer.image ? (
@@ -306,7 +306,7 @@ export default function AccountPage() {
                       />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 rounded-full shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                    <div className="w-16 h-16 rounded-full shrink-0 bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
                       {getInitials()}
                     </div>
                   )}

@@ -17,8 +17,8 @@ export default function ReturnsPage() {
             </h2>
             <p className="text-gray-700 mb-4">
               We want you to be completely satisfied with your purchase. If
-              you're not happy with your order, you can return it within 30 days
-              of delivery for a full refund or exchange.
+              you&apos;re not happy with your order, you can return it within 30
+              days of delivery for a full refund or exchange.
             </p>
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
               <p className="text-gray-700 font-semibold">
@@ -42,7 +42,7 @@ export default function ReturnsPage() {
             <ul className="space-y-2 text-gray-700">
               <li className="flex items-start">
                 <svg
-                  className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                  className="w-6 h-6 text-green-500 mr-2 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -60,7 +60,7 @@ export default function ReturnsPage() {
               </li>
               <li className="flex items-start">
                 <svg
-                  className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                  className="w-6 h-6 text-green-500 mr-2 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -76,7 +76,7 @@ export default function ReturnsPage() {
               </li>
               <li className="flex items-start">
                 <svg
-                  className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                  className="w-6 h-6 text-green-500 mr-2 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -92,7 +92,7 @@ export default function ReturnsPage() {
               </li>
               <li className="flex items-start">
                 <svg
-                  className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                  className="w-6 h-6 text-green-500 mr-2 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -116,7 +116,7 @@ export default function ReturnsPage() {
             </h2>
             <div className="space-y-4">
               <div className="flex items-start">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
+                <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
                   1
                 </div>
                 <div>
@@ -130,7 +130,7 @@ export default function ReturnsPage() {
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
+                <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
                   2
                 </div>
                 <div>
@@ -138,12 +138,12 @@ export default function ReturnsPage() {
                     Get Your Return Label
                   </h3>
                   <p className="text-gray-700">
-                    We'll email you a prepaid return shipping label
+                    We&apos;ll email you a prepaid return shipping label
                   </p>
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
+                <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
                   3
                 </div>
                 <div>
@@ -157,7 +157,7 @@ export default function ReturnsPage() {
                 </div>
               </div>
               <div className="flex items-start">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
+                <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold mr-4">
                   4
                 </div>
                 <div>
@@ -178,13 +178,13 @@ export default function ReturnsPage() {
               Refund Process
             </h2>
             <p className="text-gray-700 mb-4">
-              Once we receive your return, we'll inspect the item and process
-              your refund within 5-7 business days. The refund will be issued to
-              your original payment method.
+              Once we receive your return, we&apos;ll inspect the item and
+              process your refund within 5-7 business days. The refund will be
+              issued to your original payment method.
             </p>
             <p className="text-gray-700">
-              You'll receive an email confirmation once your refund has been
-              processed. Please allow 5-10 business days for the refund to
+              You&apos;ll receive an email confirmation once your refund has
+              been processed. Please allow 5-10 business days for the refund to
               appear in your account, depending on your bank or credit card
               company.
             </p>
@@ -196,9 +196,9 @@ export default function ReturnsPage() {
               Exchanges
             </h2>
             <p className="text-gray-700 mb-4">
-              If you'd like to exchange an item for a different size, color, or
-              product, please follow the return process above and place a new
-              order for the item you want.
+              If you&apos;d like to exchange an item for a different size,
+              color, or product, please follow the return process above and
+              place a new order for the item you want.
             </p>
             <p className="text-gray-700">
               This ensures you receive your new item as quickly as possible.

@@ -156,7 +156,7 @@ export default function FAQPage() {
                           {faq.q}
                         </span>
                         <svg
-                          className={`w-5 h-5 flex-shrink-0 transition-transform ${
+                          className={`w-5 h-5 shrink-0 transition-transform ${
                             isOpen ? "rotate-180" : ""
                           }`}
                           fill="none"
@@ -188,7 +188,7 @@ export default function FAQPage() {
             Still Have Questions?
           </h2>
           <p className="text-gray-700 mb-6">
-            Can't find the answer you're looking for? Our customer service team
+            Can&apos;t find the answer you&apos;re looking for? Our customer service team
             is here to help!
           </p>
           <a

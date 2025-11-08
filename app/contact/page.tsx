@@ -43,7 +43,7 @@ export default function ContactPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Have a question or need assistance? We're here to help!
+            Have a question or need assistance? We&apos;re here to help!
           </p>
         </div>
 
@@ -155,7 +155,7 @@ export default function ContactPage() {
               <div className="space-y-4">
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-blue-600 mr-3 shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -175,7 +175,7 @@ export default function ContactPage() {
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-blue-600 mr-3 shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -195,7 +195,7 @@ export default function ContactPage() {
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-blue-600 mr-3 shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -225,7 +225,7 @@ export default function ContactPage() {
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-blue-600 mr-3 shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

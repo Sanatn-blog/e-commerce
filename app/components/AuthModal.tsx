@@ -196,7 +196,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         <div className="flex flex-col md:flex-row">
           {/* Left side - Image */}
-          <div className="hidden md:block md:w-1/2 relative bg-gradient-to-br from-blue-500 to-purple-600">
+          <div className="hidden md:block md:w-1/2 relative bg-linear-to-br from-blue-500 to-purple-600">
             {authImage ? (
               <>
                 <Image
@@ -206,7 +206,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   className="object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent" />
               </>
             ) : null}
             <div className="absolute bottom-8 left-8 right-8 text-white">
