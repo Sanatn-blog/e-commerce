@@ -5,6 +5,8 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
+  discount?: number;
   category: string;
   images: {
     public_id: string;
@@ -55,6 +57,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
             id={product._id}
             name={product.name}
             price={product.price}
+            originalPrice={product.originalPrice}
             image={product.images[0]?.url || ""}
             category={product.category}
             rating={4.5}

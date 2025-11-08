@@ -18,6 +18,8 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
+  discount?: number;
   category: string;
   images: ProductImage[];
   stock: number;
@@ -41,13 +43,37 @@ export default function ProductDetailClient({
   const [activeTab, setActiveTab] = useState<"description" | "reviews">(
     "description"
   );
+  const [shakeButton, setShakeButton] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
-  const { success } = useToast();
+  const { success, error } = useToast();
   const inWishlist = isInWishlist(product._id);
 
   const handleAddToCart = () => {
+    // Validation: Check if size is required but not selected
+    const hasSizes = product.sizes && product.sizes.length > 0;
+    const hasColors = product.colors && product.colors.length > 0;
+
+    const missingSelections = [];
+    if (hasSizes && !selectedSize) missingSelections.push("size");
+    if (hasColors && !selectedColor) missingSelections.push("color");
+
+    if (missingSelections.length > 0) {
+      // Trigger shake animation
+      setShakeButton(true);
+      setTimeout(() => setShakeButton(false), 500);
+
+      // Show error message
+      const message = `Please select ${missingSelections.join(" and ")}`;
+      error(message);
+      return;
+    }
+
+    // Trigger adding animation
+    setIsAddingToCart(true);
+
     addToCart(
       {
         _id: product._id,
@@ -72,6 +98,9 @@ export default function ProductDetailClient({
     message += " added to cart!";
 
     success(message);
+
+    // Reset animation after completion
+    setTimeout(() => setIsAddingToCart(false), 600);
   };
 
   const handleToggleWishlist = () => {
@@ -112,7 +141,9 @@ export default function ProductDetailClient({
         <div className="space-y-4">
           {/* Main Image */}
           <div className="relative aspect-square bg-gray-200 rounded-lg overflow-hidden">
-            {product.images && product.images.length > 0 ? (
+            {product.images &&
+            product.images.length > 0 &&
+            product.images[selectedImage]?.url ? (
               <Image
                 src={product.images[selectedImage].url}
                 alt={product.name}
@@ -198,13 +229,28 @@ export default function ProductDetailClient({
               <span className="text-4xl font-bold text-gray-900">
                 ₹{product.price}
               </span>
+              {product.originalPrice &&
+                product.originalPrice > product.price && (
+                  <>
+                    <span className="text-2xl text-gray-500 line-through">
+                      ₹{product.originalPrice}
+                    </span>
+                    {product.discount && (
+                      <span className="text-lg font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                        {product.discount}% OFF
+                      </span>
+                    )}
+                  </>
+                )}
             </div>
 
             {/* Stock Status */}
             <div className="mb-6">
               {product.stock > 0 ? (
                 <p className="text-green-600 font-medium">
-                  In Stock ({product.stock} available)
+                  {product.stock <= 10
+                    ? `In Stock (${product.stock} available)`
+                    : "In Stock"}
                 </p>
               ) : (
                 <p className="text-red-600 font-medium">Out of Stock</p>
@@ -291,10 +337,42 @@ export default function ProductDetailClient({
           <div className="flex gap-4">
             <button
               onClick={handleAddToCart}
-              disabled={product.stock === 0}
-              className="flex-1 bg-rose-600 text-white py-4 rounded-lg hover:bg-rose-700 transition font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
+              disabled={product.stock === 0 || isAddingToCart}
+              className={`flex-1 bg-rose-600 text-white py-4 rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 ${
+                shakeButton
+                  ? "animate-shake"
+                  : isAddingToCart
+                  ? "scale-95 animate-pulse"
+                  : "hover:bg-rose-700 hover:scale-105 active:scale-95"
+              }`}
             >
-              Add to Cart
+              {isAddingToCart ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg
+                    className="animate-spin h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Adding...
+                </span>
+              ) : (
+                "Add to Cart"
+              )}
             </button>
             <button
               onClick={handleToggleWishlist}
@@ -428,6 +506,7 @@ export default function ProductDetailClient({
                 id={relatedProduct._id}
                 name={relatedProduct.name}
                 price={relatedProduct.price}
+                originalPrice={relatedProduct.originalPrice}
                 image={
                   relatedProduct.images?.[0]?.url || "/placeholder-image.jpg"
                 }

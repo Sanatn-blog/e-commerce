@@ -4,6 +4,8 @@ export interface IProduct extends Document {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
+  discount?: number;
   category: string;
   images: {
     public_id: string;
@@ -32,6 +34,15 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       required: [true, "Please provide product price"],
       min: [0, "Price cannot be negative"],
+    },
+    originalPrice: {
+      type: Number,
+      min: [0, "Original price cannot be negative"],
+    },
+    discount: {
+      type: Number,
+      min: [0, "Discount cannot be negative"],
+      max: [100, "Discount cannot exceed 100%"],
     },
     category: {
       type: String,

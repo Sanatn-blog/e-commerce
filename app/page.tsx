@@ -28,10 +28,12 @@ async function getProducts() {
         ...doc,
         _id: doc._id.toString(),
         images:
-          doc.images?.map((img) => ({
-            public_id: img.public_id,
-            url: img.url,
-          })) || [],
+          doc.images
+            ?.filter((img) => img && img.public_id && img.url)
+            .map((img) => ({
+              public_id: img.public_id,
+              url: img.url,
+            })) || [],
         createdAt: doc.createdAt.toISOString(),
         updatedAt: doc.updatedAt.toISOString(),
       };

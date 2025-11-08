@@ -179,8 +179,8 @@ export default function AdminSettingsPage() {
 
                 <button
                   onClick={handleSave}
-                  disabled={saving || !authModalImage}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                  disabled={saving || !authModalImage || uploading}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400 transition"
                 >
                   {saving ? "Saving..." : "Save Settings"}
                 </button>

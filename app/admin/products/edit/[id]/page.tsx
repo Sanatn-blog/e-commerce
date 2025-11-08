@@ -26,10 +26,13 @@ export default function EditProductPage() {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
+    originalPrice: "",
+    discount: "",
     category: "",
     stock: "",
     sizes: [] as string[],
@@ -47,7 +50,39 @@ export default function EditProductPage() {
   useEffect(() => {
     fetchCategories();
     fetchProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
+
+  // Debug: Log when images change
+  useEffect(() => {
+    console.log("=== formData.images CHANGED ===");
+    console.log("New images value:", formData.images);
+    console.log("Images count:", formData.images?.length);
+    console.log("=== END formData.images CHANGED ===");
+  }, [formData.images]);
+
+  // Auto-calculate discount when price or originalPrice changes
+  useEffect(() => {
+    const price = parseFloat(formData.price);
+    const originalPrice = parseFloat(formData.originalPrice);
+
+    if (price > 0 && originalPrice > 0 && originalPrice > price) {
+      const calculatedDiscount = (
+        ((originalPrice - price) / originalPrice) *
+        100
+      ).toFixed(2);
+      setFormData((prev) => ({
+        ...prev,
+        discount: calculatedDiscount,
+      }));
+    } else if (!formData.originalPrice || formData.originalPrice === "") {
+      // Clear discount if original price is removed
+      setFormData((prev) => ({
+        ...prev,
+        discount: "",
+      }));
+    }
+  }, [formData.price, formData.originalPrice]);
 
   const fetchCategories = async () => {
     try {
@@ -71,16 +106,64 @@ export default function EditProductPage() {
 
       if (data.success) {
         const product = data.product;
-        setFormData({
-          name: product.name,
-          description: product.description,
-          price: product.price.toString(),
-          category: product.category,
-          stock: product.stock.toString(),
-          sizes: product.sizes || [],
-          colors: product.colors || [],
-          images: product.images || [],
-        });
+        console.log("=== FETCH PRODUCT DEBUG ===");
+        console.log("Full product data:", JSON.stringify(product, null, 2));
+        console.log("Product images raw:", product.images);
+        console.log("Images is array?", Array.isArray(product.images));
+        console.log("Images length:", product.images?.length);
+
+        // Log each image individually
+        if (product.images) {
+          product.images.forEach((img: any, idx: number) => {
+            console.log(`Image ${idx}:`, img);
+            console.log(`  - Has url?`, !!img?.url);
+            console.log(`  - Has public_id?`, !!img?.public_id);
+            console.log(`  - URL value:`, img?.url);
+            console.log(`  - public_id value:`, img?.public_id);
+          });
+        }
+
+        // Ensure images is always an array with proper structure
+        const images = Array.isArray(product.images)
+          ? product.images
+              .filter((img: any) => {
+                const isValid =
+                  img && typeof img === "object" && img.url && img.public_id;
+                if (!isValid) {
+                  console.log("Filtered out invalid image:", img);
+                }
+                return isValid;
+              })
+              .map((img: any) => ({
+                public_id: String(img.public_id),
+                url: String(img.url),
+              }))
+          : [];
+
+        console.log("Processed images for state:", images);
+        console.log("=== END FETCH PRODUCT DEBUG ===");
+
+        const newFormData = {
+          name: product.name || "",
+          description: product.description || "",
+          price: product.price ? product.price.toString() : "",
+          originalPrice: product.originalPrice
+            ? product.originalPrice.toString()
+            : "",
+          discount: product.discount ? product.discount.toString() : "",
+          category: product.category || "",
+          stock: product.stock ? product.stock.toString() : "0",
+          sizes: Array.isArray(product.sizes) ? product.sizes : [],
+          colors: Array.isArray(product.colors) ? product.colors : [],
+          images: images,
+        };
+
+        console.log("Setting form data with images:", newFormData.images);
+        setFormData(newFormData);
+        setImagesLoaded(true);
+      } else {
+        console.error("Failed to fetch product:", data.error);
+        alert("Failed to load product: " + (data.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Error fetching product:", error);
@@ -188,13 +271,22 @@ export default function EditProductPage() {
       const productData = {
         ...formData,
         price: parseFloat(formData.price),
+        originalPrice: formData.originalPrice
+          ? parseFloat(formData.originalPrice)
+          : undefined,
+        discount: formData.discount ? parseFloat(formData.discount) : undefined,
         stock: parseInt(formData.stock),
         images: allImages,
       };
 
       console.log("=== FRONTEND DEBUG ===");
+      console.log("formData.images:", formData.images);
+      console.log("uploadedImages:", uploadedImages);
+      console.log("allImages:", allImages);
+      console.log("allImages count:", allImages.length);
       console.log("formData.colors:", formData.colors);
       console.log("formData.sizes:", formData.sizes);
+      console.log("productData.images:", productData.images);
       console.log("productData.colors:", productData.colors);
       console.log("productData.sizes:", productData.sizes);
       console.log("Full productData:", JSON.stringify(productData, null, 2));
@@ -292,10 +384,10 @@ export default function EditProductPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Price *
+                        Price (After Discount) *
                       </label>
                       <input
                         type="number"
@@ -308,6 +400,48 @@ export default function EditProductPage() {
                         }
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Original Price
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.originalPrice}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            originalPrice: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Discount (%) - Auto Calculated
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        value={formData.discount}
+                        readOnly
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-not-allowed"
+                        placeholder="Auto calculated"
+                      />
+                      {formData.discount && (
+                        <p className="text-xs text-green-600 mt-1">
+                          Calculated from original price
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -368,29 +502,58 @@ export default function EditProductPage() {
                 </h2>
                 <div className="space-y-4">
                   {/* Existing Images */}
-                  {formData.images.length > 0 && (
+                  {!imagesLoaded ? (
+                    <div className="text-sm text-gray-500 italic flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading images...
+                    </div>
+                  ) : formData.images && formData.images.length > 0 ? (
                     <div>
                       <h3 className="text-sm font-medium text-gray-700 mb-2">
-                        Current Images
+                        Current Images ({formData.images.length})
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {formData.images.map((image, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={image.url}
-                              alt={`Product ${index + 1}`}
-                              className="w-full h-32 object-cover rounded-lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeExistingImage(index)}
-                              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        {formData.images.map((image, index) => {
+                          console.log(`Rendering image ${index}:`, image.url);
+                          return (
+                            <div
+                              key={`existing-${image.public_id}-${index}`}
+                              className="relative group"
                             >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
+                              <img
+                                src={image.url}
+                                alt={`Product ${index + 1}`}
+                                className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                                onLoad={() => {
+                                  console.log(
+                                    `Image ${index} loaded successfully:`,
+                                    image.url
+                                  );
+                                }}
+                                onError={(e) => {
+                                  console.error(
+                                    `Image ${index} failed to load:`,
+                                    image.url
+                                  );
+                                  e.currentTarget.src =
+                                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999'%3EError%3C/text%3E%3C/svg%3E";
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeExistingImage(index)}
+                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-500 italic">
+                      No existing images
                     </div>
                   )}
 

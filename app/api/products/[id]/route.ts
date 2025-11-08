@@ -42,30 +42,44 @@ export async function PUT(
 
     console.log("=== API RECEIVED ===");
     console.log("Product ID:", id);
+    console.log("Body images:", body.images);
+    console.log(
+      "Body images type:",
+      typeof body.images,
+      Array.isArray(body.images)
+    );
+    console.log("Body images length:", body.images?.length);
     console.log("Body colors:", body.colors);
     console.log("Body sizes:", body.sizes);
-    console.log(
-      "Body colors type:",
-      typeof body.colors,
-      Array.isArray(body.colors)
-    );
-    console.log("Body colors length:", body.colors?.length);
     console.log("Full body:", JSON.stringify(body, null, 2));
     console.log("=== END API RECEIVED ===");
+
+    // Validate and format images
+    const images = Array.isArray(body.images)
+      ? body.images.filter((img: any) => img && img.url && img.public_id)
+      : [];
+
+    console.log("=== PROCESSED IMAGES ===");
+    console.log("Filtered images:", images);
+    console.log("Images count:", images.length);
+    console.log("=== END PROCESSED IMAGES ===");
 
     // Explicitly set all fields including arrays
     const updateData = {
       name: body.name,
       description: body.description,
       price: body.price,
+      originalPrice: body.originalPrice,
+      discount: body.discount,
       category: body.category,
       stock: body.stock,
-      images: body.images,
+      images: images,
       sizes: body.sizes || [],
       colors: body.colors || [],
     };
 
     console.log("=== UPDATE DATA ===");
+    console.log("updateData.images:", updateData.images);
     console.log("updateData.colors:", updateData.colors);
     console.log("updateData.sizes:", updateData.sizes);
     console.log("=== END UPDATE DATA ===");
@@ -87,6 +101,8 @@ export async function PUT(
     }
 
     console.log("=== AFTER UPDATE ===");
+    console.log("Product images:", product.images);
+    console.log("Product images count:", product.images?.length);
     console.log("Product colors:", product.colors);
     console.log("Product sizes:", product.sizes);
     console.log("Full product:", JSON.stringify(product, null, 2));

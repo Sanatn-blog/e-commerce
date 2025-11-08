@@ -38,15 +38,32 @@ export default function CarouselManagement() {
 
   const fetchCarousels = async () => {
     try {
+      console.log("Fetching carousels from API...");
       const response = await fetch("/api/admin/carousel");
+      console.log("Response status:", response.status);
+
       if (response.ok) {
         const data = await response.json();
         console.log("Fetched carousels:", data);
         setCarousels(data);
+      } else {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        console.error("Failed to fetch carousels:", errorData);
+        toast.error(
+          `Failed to load carousels: ${
+            errorData.details || errorData.error || "Unknown error"
+          }`
+        );
       }
     } catch (error) {
       console.error("Error fetching carousels:", error);
-      toast.error("Failed to load carousels");
+      toast.error(
+        `Failed to load carousels: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -120,6 +137,7 @@ export default function CarouselManagement() {
         : "/api/admin/carousel";
       const method = editingId ? "PUT" : "POST";
 
+      console.log(`${method} ${url}`, formData);
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -135,11 +153,23 @@ export default function CarouselManagement() {
         resetForm();
         fetchCarousels();
       } else {
-        toast.error("Failed to save carousel");
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        console.error("Failed to save carousel:", errorData);
+        toast.error(
+          `Failed to save carousel: ${
+            errorData.details || errorData.error || "Unknown error"
+          }`
+        );
       }
     } catch (error) {
       console.error("Error saving carousel:", error);
-      toast.error("An error occurred");
+      toast.error(
+        `An error occurred: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   };
 
@@ -149,6 +179,7 @@ export default function CarouselManagement() {
     }
 
     try {
+      console.log("Deleting carousel:", id);
       const response = await fetch(`/api/admin/carousel/${id}`, {
         method: "DELETE",
       });
@@ -157,11 +188,23 @@ export default function CarouselManagement() {
         toast.success("Carousel deleted successfully");
         fetchCarousels();
       } else {
-        toast.error("Failed to delete carousel");
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        console.error("Failed to delete carousel:", errorData);
+        toast.error(
+          `Failed to delete carousel: ${
+            errorData.details || errorData.error || "Unknown error"
+          }`
+        );
       }
     } catch (error) {
       console.error("Error deleting carousel:", error);
-      toast.error("An error occurred");
+      toast.error(
+        `An error occurred: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   };
 
@@ -338,7 +381,8 @@ export default function CarouselManagement() {
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                      disabled={!formData.image || uploading}
+                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
                     >
                       {editingId ? "Update" : "Create"}
                     </button>

@@ -19,6 +19,13 @@ interface CartItem {
   color?: string;
 }
 
+interface PromoCode {
+  code: string;
+  discountAmount: number;
+  discountType: string;
+  discountValue: number;
+}
+
 interface CartContextType {
   cart: CartItem[];
   addToCart: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
@@ -32,12 +39,15 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  appliedPromo: PromoCode | null;
+  setAppliedPromo: (promo: PromoCode | null) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -45,12 +55,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
+    const savedPromo = localStorage.getItem("appliedPromo");
+    if (savedPromo) {
+      setAppliedPromo(JSON.parse(savedPromo));
+    }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
+  // Save promo to localStorage whenever it changes
+  useEffect(() => {
+    if (appliedPromo) {
+      localStorage.setItem("appliedPromo", JSON.stringify(appliedPromo));
+    } else {
+      localStorage.removeItem("appliedPromo");
+    }
+  }, [appliedPromo]);
 
   const addToCart = (
     item: Omit<CartItem, "quantity">,
@@ -103,6 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setCart([]);
+    setAppliedPromo(null);
   };
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -121,6 +145,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         cartCount,
         cartTotal,
+        appliedPromo,
+        setAppliedPromo,
       }}
     >
       {children}

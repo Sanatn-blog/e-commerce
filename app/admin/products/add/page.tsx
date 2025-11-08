@@ -26,6 +26,8 @@ export default function AddProductPage() {
     name: "",
     description: "",
     price: "",
+    originalPrice: "",
+    discount: "",
     category: "",
     stock: "",
     sizes: [] as string[],
@@ -42,7 +44,31 @@ export default function AddProductPage() {
 
   useEffect(() => {
     fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-calculate discount when price or originalPrice changes
+  useEffect(() => {
+    const price = parseFloat(formData.price);
+    const originalPrice = parseFloat(formData.originalPrice);
+
+    if (price > 0 && originalPrice > 0 && originalPrice > price) {
+      const calculatedDiscount = (
+        ((originalPrice - price) / originalPrice) *
+        100
+      ).toFixed(2);
+      setFormData((prev) => ({
+        ...prev,
+        discount: calculatedDiscount,
+      }));
+    } else if (!formData.originalPrice || formData.originalPrice === "") {
+      // Clear discount if original price is removed
+      setFormData((prev) => ({
+        ...prev,
+        discount: "",
+      }));
+    }
+  }, [formData.price, formData.originalPrice]);
 
   const fetchCategories = async () => {
     try {
@@ -152,6 +178,10 @@ export default function AddProductPage() {
       const productData = {
         ...formData,
         price: parseFloat(formData.price),
+        originalPrice: formData.originalPrice
+          ? parseFloat(formData.originalPrice)
+          : undefined,
+        discount: formData.discount ? parseFloat(formData.discount) : undefined,
         stock: parseInt(formData.stock),
         images: uploadedImages,
       };
@@ -238,10 +268,10 @@ export default function AddProductPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Price *
+                        Price (After Discount) *
                       </label>
                       <input
                         type="number"
@@ -255,6 +285,49 @@ export default function AddProductPage() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="0.00"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Original Price
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.originalPrice}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            originalPrice: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Discount (%) - Auto Calculated
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        value={formData.discount}
+                        readOnly
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-not-allowed"
+                        placeholder="Auto calculated"
+                      />
+                      {formData.discount && (
+                        <p className="text-xs text-green-600 mt-1">
+                          Calculated from original price
+                        </p>
+                      )}
                     </div>
 
                     <div>

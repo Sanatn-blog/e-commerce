@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Heart, ShoppingCart } from "lucide-react";
 import AuthButton from "./AuthButton";
+import SearchBar from "./SearchBar";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
 
@@ -13,13 +14,16 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-4">
           <div className="flex items-center gap-8">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
+            <Link
+              href="/"
+              className="text-2xl font-bold text-gray-900 whitespace-nowrap"
+            >
               <span className="text-red-500">Fashion</span>Store
             </Link>
 
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-6">
               <Link href="/men" className="text-gray-700 hover:text-gray-900">
                 Men
               </Link>
@@ -39,6 +43,10 @@ export default function Navbar() {
                 Sale
               </Link>
             </div>
+          </div>
+
+          <div className="hidden md:block flex-1 max-w-md mx-4">
+            <SearchBar />
           </div>
 
           <div className="flex items-center gap-6">

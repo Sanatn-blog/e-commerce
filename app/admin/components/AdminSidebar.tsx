@@ -11,6 +11,7 @@ import {
   Tag,
   BarChart3,
   Image,
+  Ticket,
 } from "lucide-react";
 
 const menuItems = [
@@ -19,6 +20,7 @@ const menuItems = [
   { icon: ShoppingCart, label: "Orders", href: "/admin/orders" },
   { icon: Users, label: "Customers", href: "/admin/customers" },
   { icon: Tag, label: "Categories", href: "/admin/categories" },
+  { icon: Ticket, label: "Promo Codes", href: "/admin/promo-codes" },
   { icon: Image, label: "Carousel", href: "/admin/carousel" },
   { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },

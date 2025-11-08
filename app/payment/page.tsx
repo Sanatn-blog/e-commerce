@@ -6,6 +6,12 @@ import { useCart } from "../context/CartContext";
 import { CreditCard, Lock, CheckCircle, ArrowLeft, Wallet } from "lucide-react";
 import Link from "next/link";
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 interface CheckoutDetails {
   name: string;
   email: string;
@@ -27,14 +33,11 @@ export default function PaymentPage() {
   const [checkoutDetails, setCheckoutDetails] =
     useState<CheckoutDetails | null>(null);
   const [orderTotal, setOrderTotal] = useState("0.00");
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod">("card");
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: "",
-    cardName: "",
-    expiryDate: "",
-    cvv: "",
-  });
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">(
+    "razorpay"
+  );
   const [error, setError] = useState("");
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   useEffect(() => {
     const details = sessionStorage.getItem("checkoutDetails");
@@ -48,97 +51,162 @@ export default function PaymentPage() {
     setCheckoutDetails(JSON.parse(details));
     setOrderTotal(total);
     setLoading(false);
+
+    // Load Razorpay script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => setRazorpayLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, [cart, router]);
 
-  const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-    const name = e.target.name;
-
-    if (name === "cardNumber") {
-      value = value.replace(/\D/g, "").slice(0, 16);
-      value = value.replace(/(\d{4})/g, "$1 ").trim();
-    } else if (name === "expiryDate") {
-      value = value.replace(/\D/g, "").slice(0, 4);
-      if (value.length >= 2) {
-        value = value.slice(0, 2) + "/" + value.slice(2);
-      }
-    } else if (name === "cvv") {
-      value = value.replace(/\D/g, "").slice(0, 3);
+  const handleRazorpayPayment = async () => {
+    if (!razorpayLoaded) {
+      setError("Payment gateway is loading. Please wait...");
+      return;
     }
-
-    setCardDetails({ ...cardDetails, [name]: value });
-    setError("");
-  };
-
-  const validateCardDetails = () => {
-    if (paymentMethod === "cod") return true;
-
-    if (!cardDetails.cardNumber.replace(/\s/g, "")) {
-      setError("Card number is required");
-      return false;
-    }
-    if (cardDetails.cardNumber.replace(/\s/g, "").length !== 16) {
-      setError("Please enter a valid 16-digit card number");
-      return false;
-    }
-    if (!cardDetails.cardName.trim()) {
-      setError("Cardholder name is required");
-      return false;
-    }
-    if (!cardDetails.expiryDate || cardDetails.expiryDate.length !== 5) {
-      setError("Please enter a valid expiry date (MM/YY)");
-      return false;
-    }
-    if (!cardDetails.cvv || cardDetails.cvv.length !== 3) {
-      setError("Please enter a valid 3-digit CVV");
-      return false;
-    }
-    return true;
-  };
-
-  const handlePlaceOrder = async () => {
-    if (!validateCardDetails()) return;
 
     setProcessing(true);
     setError("");
 
     try {
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Create Razorpay order
+      const orderResponse = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: parseFloat(orderTotal),
+          currency: "INR",
+          receipt: `order_${Date.now()}`,
+        }),
+      });
 
-      // Create order
-      const orderData = {
-        items: cart,
-        customerDetails: checkoutDetails,
-        paymentMethod,
-        paymentDetails:
-          paymentMethod === "card"
-            ? {
-                last4: cardDetails.cardNumber.slice(-4),
-                cardType: "Visa", // You can detect card type
-              }
-            : null,
-        total: parseFloat(orderTotal),
-        status: paymentMethod === "cod" ? "pending" : "paid",
+      if (!orderResponse.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      const { orderId, amount, currency } = await orderResponse.json();
+
+      // Razorpay options
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: amount,
+        currency: currency,
+        name: "Your Store Name",
+        description: "Order Payment",
+        order_id: orderId,
+        prefill: {
+          name: checkoutDetails?.name || "",
+          email: checkoutDetails?.email || "",
+          contact: checkoutDetails?.phone || "",
+        },
+        theme: {
+          color: "#2563eb",
+        },
+        handler: async function (response: any) {
+          try {
+            // Verify payment
+            const verifyResponse = await fetch("/api/razorpay/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            if (!verifyResponse.ok) {
+              throw new Error("Payment verification failed");
+            }
+
+            // Create order in database
+            const orderData = {
+              items: cart,
+              customerDetails: checkoutDetails,
+              paymentMethod: "razorpay",
+              paymentDetails: {
+                paymentId: response.razorpay_payment_id,
+                orderId: response.razorpay_order_id,
+              },
+              total: parseFloat(orderTotal),
+              status: "paid",
+            };
+
+            console.log("Order placed:", orderData);
+
+            // Clear cart and session storage
+            clearCart();
+            sessionStorage.removeItem("checkoutDetails");
+            sessionStorage.removeItem("orderTotal");
+
+            setOrderPlaced(true);
+
+            // Redirect to success page after 3 seconds
+            setTimeout(() => {
+              router.push("/");
+            }, 3000);
+          } catch (err: any) {
+            setError(err.message || "Payment verification failed");
+            setProcessing(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setProcessing(false);
+            setError("Payment cancelled");
+          },
+        },
       };
 
-      // Here you would typically send this to your backend
-      console.log("Order placed:", orderData);
-
-      // Clear cart and session storage
-      clearCart();
-      sessionStorage.removeItem("checkoutDetails");
-      sessionStorage.removeItem("orderTotal");
-
-      setOrderPlaced(true);
-
-      // Redirect to success page after 3 seconds
-      setTimeout(() => {
-        router.push("/");
-      }, 3000);
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (err: any) {
-      setError("Payment failed. Please try again.");
+      setError(err.message || "Payment failed. Please try again.");
       setProcessing(false);
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    if (paymentMethod === "razorpay") {
+      await handleRazorpayPayment();
+    } else {
+      // Cash on Delivery
+      setProcessing(true);
+      setError("");
+
+      try {
+        // Create order
+        const orderData = {
+          items: cart,
+          customerDetails: checkoutDetails,
+          paymentMethod: "cod",
+          paymentDetails: null,
+          total: parseFloat(orderTotal),
+          status: "pending",
+        };
+
+        console.log("Order placed:", orderData);
+
+        // Clear cart and session storage
+        clearCart();
+        sessionStorage.removeItem("checkoutDetails");
+        sessionStorage.removeItem("orderTotal");
+
+        setOrderPlaced(true);
+
+        // Redirect to success page after 3 seconds
+        setTimeout(() => {
+          router.push("/");
+        }, 3000);
+      } catch (err: any) {
+        setError("Order placement failed. Please try again.");
+        setProcessing(false);
+      }
     }
   };
 
@@ -211,16 +279,19 @@ export default function PaymentPage() {
                   <input
                     type="radio"
                     name="paymentMethod"
-                    value="card"
-                    checked={paymentMethod === "card"}
+                    value="razorpay"
+                    checked={paymentMethod === "razorpay"}
                     onChange={(e) =>
-                      setPaymentMethod(e.target.value as "card" | "cod")
+                      setPaymentMethod(e.target.value as "razorpay" | "cod")
                     }
                     className="w-4 h-4 text-blue-600"
                   />
                   <CreditCard size={24} className="ml-3 text-gray-600" />
                   <span className="ml-3 text-gray-900 font-medium">
-                    Credit/Debit Card
+                    Pay Online (Razorpay)
+                  </span>
+                  <span className="ml-auto text-xs text-gray-500">
+                    Cards, UPI, Wallets
                   </span>
                 </label>
 
@@ -231,7 +302,7 @@ export default function PaymentPage() {
                     value="cod"
                     checked={paymentMethod === "cod"}
                     onChange={(e) =>
-                      setPaymentMethod(e.target.value as "card" | "cod")
+                      setPaymentMethod(e.target.value as "razorpay" | "cod")
                     }
                     className="w-4 h-4 text-blue-600"
                   />
@@ -243,72 +314,17 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            {/* Card Details */}
-            {paymentMethod === "card" && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                  Card Details
-                </h2>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Card Number
-                    </label>
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      value={cardDetails.cardNumber}
-                      onChange={handleCardInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                      placeholder="1234 5678 9012 3456"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Cardholder Name
-                    </label>
-                    <input
-                      type="text"
-                      name="cardName"
-                      value={cardDetails.cardName}
-                      onChange={handleCardInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                      placeholder="John Doe"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Expiry Date
-                      </label>
-                      <input
-                        type="text"
-                        name="expiryDate"
-                        value={cardDetails.expiryDate}
-                        onChange={handleCardInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                        placeholder="MM/YY"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        CVV
-                      </label>
-                      <input
-                        type="text"
-                        name="cvv"
-                        value={cardDetails.cvv}
-                        onChange={handleCardInputChange}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                        placeholder="123"
-                      />
-                    </div>
-                  </div>
-                </div>
+            {/* Razorpay Info */}
+            {paymentMethod === "razorpay" && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 mb-2">
+                  <strong>Secure Online Payment:</strong> You will be redirected
+                  to Razorpay's secure payment gateway.
+                </p>
+                <p className="text-sm text-blue-700">
+                  Accepted payment methods: Credit/Debit Cards, UPI, Net
+                  Banking, Wallets
+                </p>
               </div>
             )}
 

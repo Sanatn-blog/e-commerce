@@ -28,6 +28,14 @@ export default function ProductsTable() {
       const response = await fetch("/api/products");
       const data = await response.json();
       if (data.success) {
+        console.log("Products fetched:", data.products);
+        data.products.forEach((p: Product, i: number) => {
+          console.log(`Product ${i} (${p.name}):`, {
+            hasImages: !!p.images,
+            imagesLength: p.images?.length,
+            firstImage: p.images?.[0],
+          });
+        });
         setProducts(data.products);
       }
     } catch (error) {
@@ -113,12 +121,16 @@ export default function ProductsTable() {
               >
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-3">
-                    {product.images[0] && (
+                    {product.images?.[0]?.url ? (
                       <img
                         src={product.images[0].url}
                         alt={product.name}
                         className="w-12 h-12 object-cover rounded"
                       />
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">
+                        No img
+                      </div>
                     )}
                     <span className="text-sm text-gray-900">
                       {product.name}

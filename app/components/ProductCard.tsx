@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { useWishlist } from "@/app/context/WishlistContext";
-import { useCart } from "@/app/context/CartContext";
-import { useToast } from "@/app/context/ToastContext";
 
 interface ProductCardProps {
   id: string | number;
@@ -29,10 +26,7 @@ export default function ProductCard({
   reviews,
 }: ProductCardProps) {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
-  const { addToCart } = useCart();
-  const { success } = useToast();
   const inWishlist = isInWishlist(String(id));
-  const [isAdding, setIsAdding] = useState(false);
 
   const discount = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
@@ -53,27 +47,6 @@ export default function ProductCard({
         category,
       });
     }
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsAdding(true);
-
-    addToCart({
-      _id: String(id),
-      name,
-      price,
-      image,
-      category,
-    });
-
-    success(`${name} added to cart!`);
-
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 600);
   };
 
   return (
@@ -168,70 +141,31 @@ export default function ProductCard({
         </div>
       </Link>
       <div className="px-4 pb-4">
-        <button
-          onClick={handleAddToCart}
-          disabled={isAdding}
-          className={`
-            w-full bg-rose-600 text-white py-2 rounded-lg font-medium
-            relative overflow-hidden
-            transition-all duration-300 ease-out
-            hover:bg-rose-700 hover:shadow-lg hover:-translate-y-0.5
-            active:scale-95 active:shadow-md
-            disabled:cursor-not-allowed
-            ${isAdding ? "scale-95 bg-rose-700" : ""}
-          `}
+        <Link
+          href={`/product/${id}`}
+          className="w-full bg-rose-600 text-white py-2 rounded-lg font-medium transition-all duration-200 hover:bg-rose-700 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
         >
-          <span
-            className={`inline-flex items-center gap-2 transition-all duration-300 ${
-              isAdding ? "scale-110" : ""
-            }`}
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            {isAdding ? (
-              <>
-                <svg
-                  className="w-5 h-5 animate-bounce"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                Added!
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-5 h-5 transition-transform group-hover:scale-110"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                Add to Cart
-              </>
-            )}
-          </span>
-          {isAdding && (
-            <span
-              className="absolute inset-0 bg-white/20 animate-ping rounded-lg"
-              style={{
-                animationDuration: "0.6s",
-                animationIterationCount: "1",
-              }}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
             />
-          )}
-        </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
+          </svg>
+          View Details
+        </Link>
       </div>
     </div>
   );
