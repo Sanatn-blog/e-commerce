@@ -3,11 +3,13 @@ import AdminHeader from "../../../components/AdminHeader";
 import CategoryForm from "../../components/CategoryForm";
 import { Toaster } from "react-hot-toast";
 
-export default function EditCategoryPage({
+export default async function EditCategoryPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Toaster position="top-right" />
@@ -18,7 +20,7 @@ export default function EditCategoryPage({
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Edit Category
           </h1>
-          <CategoryForm categoryId={params.id} />
+          <CategoryForm categoryId={id} />
         </main>
       </div>
     </div>

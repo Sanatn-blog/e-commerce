@@ -1,8 +1,22 @@
 import Link from "next/link";
+import Image from "next/image";
+import { JSX, useState } from "react";
 
-const categories = [
-  {
-    name: "Men",
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  order: number;
+}
+
+interface CategoryGridProps {
+  categories: Category[];
+}
+
+const categoryIcons: Record<string, { icon: JSX.Element; color: string }> = {
+  men: {
     icon: (
       <svg
         className="w-12 h-12 mx-auto"
@@ -18,11 +32,9 @@ const categories = [
         />
       </svg>
     ),
-    href: "/men",
     color: "bg-blue-100 text-blue-600",
   },
-  {
-    name: "Women",
+  women: {
     icon: (
       <svg
         className="w-12 h-12 mx-auto"
@@ -38,11 +50,9 @@ const categories = [
         />
       </svg>
     ),
-    href: "/women",
     color: "bg-pink-100 text-pink-600",
   },
-  {
-    name: "Kids",
+  kids: {
     icon: (
       <svg
         className="w-12 h-12 mx-auto"
@@ -58,11 +68,9 @@ const categories = [
         />
       </svg>
     ),
-    href: "/kids",
     color: "bg-yellow-100 text-yellow-600",
   },
-  {
-    name: "Shoes",
+  shoes: {
     icon: (
       <svg
         className="w-12 h-12 mx-auto"
@@ -78,11 +86,9 @@ const categories = [
         />
       </svg>
     ),
-    href: "/shoes",
     color: "bg-green-100 text-green-600",
   },
-  {
-    name: "Accessories",
+  accessories: {
     icon: (
       <svg
         className="w-12 h-12 mx-auto"
@@ -98,11 +104,9 @@ const categories = [
         />
       </svg>
     ),
-    href: "/accessories",
     color: "bg-purple-100 text-purple-600",
   },
-  {
-    name: "Sale",
+  sale: {
     icon: (
       <svg
         className="w-12 h-12 mx-auto"
@@ -118,28 +122,73 @@ const categories = [
         />
       </svg>
     ),
-    href: "/sale",
     color: "bg-red-100 text-red-600",
   },
-];
+};
 
-export default function CategoryGrid() {
+export default function CategoryGrid({ categories }: CategoryGridProps) {
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+
+  const handleImageError = (categoryId: string) => {
+    setImageErrors((prev) => new Set(prev).add(categoryId));
+  };
+
   return (
     <section className="py-12">
       <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
         Shop by Category
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {categories.map((category) => (
-          <Link
-            key={category.name}
-            href={category.href}
-            className={`${category.color} rounded-xl p-6 text-center hover:shadow-lg transition-all hover:scale-105`}
-          >
-            <div className="mb-3">{category.icon}</div>
-            <h3 className="font-semibold">{category.name}</h3>
-          </Link>
-        ))}
+        {categories.map((category) => {
+          const categoryStyle = categoryIcons[category.slug] || {
+            icon: (
+              <svg
+                className="w-12 h-12 mx-auto"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            ),
+            color: "bg-gray-100 text-gray-600",
+          };
+
+          const hasValidImage =
+            category.image && !imageErrors.has(category._id);
+
+          return (
+            <Link
+              key={category._id}
+              href={`/${category.slug}`}
+              className={`${
+                hasValidImage ? "bg-white text-gray-900" : categoryStyle.color
+              } rounded-xl p-6 text-center hover:shadow-lg transition-all hover:scale-105 overflow-hidden`}
+            >
+              {hasValidImage ? (
+                <div className="mb-3 relative w-full h-24 mx-auto">
+                  <Image
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                    className="object-cover rounded-lg"
+                    unoptimized
+                    onError={() => handleImageError(category._id)}
+                  />
+                </div>
+              ) : (
+                <div className="mb-3">{categoryStyle.icon}</div>
+              )}
+              <h3 className="font-semibold">{category.name}</h3>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

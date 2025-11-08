@@ -26,6 +26,7 @@ export default function CategoriesTable() {
   const [categories, setCategories] = useState<CategoryWithChildren[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchCategories();
@@ -163,17 +164,27 @@ export default function CategoriesTable() {
             {filteredCategories.map((category) => (
               <tr key={category._id}>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {category.image ? (
-                    <Image
-                      src={category.image}
-                      alt={category.name}
-                      width={50}
-                      height={50}
-                      className="rounded object-cover"
-                    />
+                  {category.image && !imageErrors.has(category._id) ? (
+                    <div className="w-16 h-16 relative" title={category.image}>
+                      <Image
+                        src={category.image}
+                        alt={category.name}
+                        fill
+                        sizes="64px"
+                        className="rounded object-cover border border-gray-200"
+                        unoptimized
+                        onError={() =>
+                          setImageErrors((prev) =>
+                            new Set(prev).add(category._id)
+                          )
+                        }
+                      />
+                    </div>
                   ) : (
-                    <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                      <span className="text-gray-400 text-xs">No img</span>
+                    <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                      <span className="text-gray-400 text-xs">
+                        {category.image ? "Error" : "No img"}
+                      </span>
                     </div>
                   )}
                 </td>

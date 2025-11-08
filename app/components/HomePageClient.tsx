@@ -10,11 +10,24 @@ import PromoSection from "./PromoSection";
 import Features from "./Features";
 import Newsletter from "./Newsletter";
 
-interface HomePageClientProps {
-  products: any[];
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  order: number;
 }
 
-export default function HomePageClient({ products }: HomePageClientProps) {
+interface HomePageClientProps {
+  products: any[];
+  categories: Category[];
+}
+
+export default function HomePageClient({
+  products,
+  categories,
+}: HomePageClientProps) {
   const { customer, loading } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -39,7 +52,7 @@ export default function HomePageClient({ products }: HomePageClientProps) {
       <Hero />
       <main className="grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <CategoryGrid />
+          <CategoryGrid categories={categories} />
           <FeaturedProducts products={products} />
           <PromoSection />
           <Features />

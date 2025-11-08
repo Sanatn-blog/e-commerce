@@ -1,20 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminSidebar from "../../components/AdminSidebar";
 import AdminHeader from "../../components/AdminHeader";
 import { Upload, X, Loader2 } from "lucide-react";
 
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  parentCategory?: {
+    _id: string;
+    name: string;
+  };
+}
+
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
-    category: "men",
+    category: "",
     stock: "",
     sizes: [] as string[],
     colors: [] as string[],
@@ -26,8 +38,33 @@ export default function AddProductPage() {
   const [sizeInput, setSizeInput] = useState("");
   const [colorInput, setColorInput] = useState("");
 
-  const categories = ["men", "women", "kids", "shoes", "accessories"];
   const commonSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/admin/categories");
+      const result = await response.json();
+
+      if (result.success) {
+        setCategories(result.categories);
+        // Set first category as default if available
+        if (result.categories.length > 0 && !formData.category) {
+          setFormData((prev) => ({
+            ...prev,
+            category: result.categories[0].slug,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -230,13 +267,25 @@ export default function AddProductPage() {
                         onChange={(e) =>
                           setFormData({ ...formData, category: e.target.value })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                        disabled={loadingCategories}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       >
-                        {categories.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                          </option>
-                        ))}
+                        {loadingCategories ? (
+                          <option value="">Loading categories...</option>
+                        ) : categories.length === 0 ? (
+                          <option value="">No categories available</option>
+                        ) : (
+                          <>
+                            <option value="">Select a category</option>
+                            {categories.map((cat) => (
+                              <option key={cat._id} value={cat.slug}>
+                                {cat.parentCategory
+                                  ? `${cat.parentCategory.name} > ${cat.name}`
+                                  : cat.name}
+                              </option>
+                            ))}
+                          </>
+                        )}
                       </select>
                     </div>
 

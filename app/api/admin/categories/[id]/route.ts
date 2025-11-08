@@ -4,14 +4,14 @@ import Category from "@/models/Category";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
-    const category = await Category.findById(params.id).populate(
-      "parentCategory",
-      "name"
-    );
+    const { id } = await params;
+    const category = await Category.findById(id)
+      .populate("parentCategory", "name")
+      .lean();
 
     if (!category) {
       return NextResponse.json(
@@ -22,7 +22,16 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      category,
+      category: {
+        ...category,
+        _id: category._id.toString(),
+        parentCategory: category.parentCategory
+          ? {
+              _id: category.parentCategory._id.toString(),
+              name: category.parentCategory.name,
+            }
+          : undefined,
+      },
     });
   } catch (error) {
     console.error("Error fetching category:", error);
@@ -35,14 +44,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
 
     const existingCategory = await Category.findOne({
-      _id: { $ne: params.id },
+      _id: { $ne: id },
       $or: [{ name: body.name }, { slug: body.slug }],
     });
 
@@ -53,10 +63,15 @@ export async function PUT(
       );
     }
 
-    const category = await Category.findByIdAndUpdate(params.id, body, {
+    // Convert empty string to null for parentCategory
+    if (body.parentCategory === "") {
+      body.parentCategory = null;
+    }
+
+    const category = await Category.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
-    });
+    }).lean();
 
     if (!category) {
       return NextResponse.json(
@@ -67,7 +82,10 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      category,
+      category: {
+        ...category,
+        _id: category._id.toString(),
+      },
     });
   } catch (error) {
     console.error("Error updating category:", error);
@@ -80,15 +98,21 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
 
-    const category = await Category.findByIdAndUpdate(params.id, body, {
+    // Convert empty string to null for parentCategory
+    if (body.parentCategory === "") {
+      body.parentCategory = null;
+    }
+
+    const category = await Category.findByIdAndUpdate(id, body, {
       new: true,
-    });
+    }).lean();
 
     if (!category) {
       return NextResponse.json(
@@ -99,7 +123,10 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      category,
+      category: {
+        ...category,
+        _id: category._id.toString(),
+      },
     });
   } catch (error) {
     console.error("Error updating category:", error);
@@ -112,12 +139,13 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
 
-    const hasChildren = await Category.findOne({ parentCategory: params.id });
+    const hasChildren = await Category.findOne({ parentCategory: id });
     if (hasChildren) {
       return NextResponse.json(
         {
@@ -128,7 +156,7 @@ export async function DELETE(
       );
     }
 
-    const category = await Category.findByIdAndDelete(params.id);
+    const category = await Category.findByIdAndDelete(id);
 
     if (!category) {
       return NextResponse.json(

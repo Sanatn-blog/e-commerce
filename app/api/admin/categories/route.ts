@@ -7,11 +7,21 @@ export async function GET() {
     await connectDB();
     const categories = await Category.find()
       .populate("parentCategory", "name")
-      .sort({ order: 1, name: 1 });
+      .sort({ order: 1, name: 1 })
+      .lean();
 
     return NextResponse.json({
       success: true,
-      categories,
+      categories: categories.map((cat) => ({
+        ...cat,
+        _id: cat._id.toString(),
+        parentCategory: cat.parentCategory
+          ? {
+              _id: cat.parentCategory._id.toString(),
+              name: cat.parentCategory.name,
+            }
+          : undefined,
+      })),
     });
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -38,11 +48,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Convert empty string to null for parentCategory
+    if (body.parentCategory === "") {
+      body.parentCategory = null;
+    }
+
     const category = await Category.create(body);
+    const plainCategory = category.toObject();
 
     return NextResponse.json({
       success: true,
-      category,
+      category: {
+        ...plainCategory,
+        _id: plainCategory._id.toString(),
+      },
     });
   } catch (error) {
     console.error("Error creating category:", error);
