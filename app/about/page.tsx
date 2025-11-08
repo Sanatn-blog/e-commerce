@@ -50,7 +50,7 @@ export default function AboutPage() {
                 Customer Focus
               </h3>
               <p className="text-gray-700">
-                Your satisfaction is our priority. We're here to provide
+                Your satisfaction is our priority. We&apos;re here to provide
                 exceptional service and support.
               </p>
             </div>
@@ -74,7 +74,7 @@ export default function AboutPage() {
           <ul className="space-y-3 text-gray-700">
             <li className="flex items-start">
               <svg
-                className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                className="w-6 h-6 text-green-500 mr-2 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -92,7 +92,7 @@ export default function AboutPage() {
             </li>
             <li className="flex items-start">
               <svg
-                className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                className="w-6 h-6 text-green-500 mr-2 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -108,7 +108,7 @@ export default function AboutPage() {
             </li>
             <li className="flex items-start">
               <svg
-                className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                className="w-6 h-6 text-green-500 mr-2 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -124,7 +124,7 @@ export default function AboutPage() {
             </li>
             <li className="flex items-start">
               <svg
-                className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                className="w-6 h-6 text-green-500 mr-2 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -140,7 +140,7 @@ export default function AboutPage() {
             </li>
             <li className="flex items-start">
               <svg
-                className="w-6 h-6 text-green-500 mr-2 flex-shrink-0"
+                className="w-6 h-6 text-green-500 mr-2 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
