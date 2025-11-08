@@ -1,14 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Category from "@/models/Category";
+import { Types } from "mongoose";
+
+interface CategoryLean {
+  _id: Types.ObjectId;
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string;
+  parentCategory?: {
+    _id: Types.ObjectId;
+    name: string;
+  } | null;
+  isActive: boolean;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export async function GET() {
   try {
     await connectDB();
-    const categories = await Category.find()
+    const categories = (await Category.find()
       .populate("parentCategory", "name")
       .sort({ order: 1, name: 1 })
-      .lean();
+      .lean()) as unknown as CategoryLean[];
 
     return NextResponse.json({
       success: true,

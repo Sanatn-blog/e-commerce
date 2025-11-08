@@ -79,7 +79,9 @@ async function getCarousels() {
       .sort({ order: 1 })
       .lean();
 
-    return carousels.map((carousel) => {
+    console.log("Server: Fetched carousels from DB:", carousels.length);
+
+    const mappedCarousels = carousels.map((carousel) => {
       const doc = carousel as unknown as MongoDocument & {
         title: string;
         subtitle?: string;
@@ -88,7 +90,7 @@ async function getCarousels() {
         order: number;
         isActive: boolean;
       };
-      return {
+      const result = {
         _id: doc._id.toString(),
         title: doc.title,
         subtitle: doc.subtitle,
@@ -97,7 +99,11 @@ async function getCarousels() {
         order: doc.order,
         isActive: doc.isActive,
       };
+      console.log("Server: Carousel item image URL:", result.image);
+      return result;
     });
+
+    return mappedCarousels;
   } catch (error) {
     console.error("Failed to fetch carousels:", error);
     return [];

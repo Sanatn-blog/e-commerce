@@ -3,7 +3,7 @@ import connectDB from "@/lib/mongodb";
 import Category from "@/models/Category";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -24,10 +24,14 @@ export async function GET(
       success: true,
       category: {
         ...category,
+        // @ts-expect-error - Mongoose lean() with populate() has type inference issues
         _id: category._id.toString(),
+        // @ts-expect-error - Mongoose lean() with populate() has type inference issues
         parentCategory: category.parentCategory
           ? {
+              // @ts-expect-error - Mongoose lean() with populate() has type inference issues
               _id: category.parentCategory._id.toString(),
+              // @ts-expect-error - Mongoose lean() with populate() has type inference issues
               name: category.parentCategory.name,
             }
           : undefined,
@@ -84,6 +88,7 @@ export async function PUT(
       success: true,
       category: {
         ...category,
+        // @ts-expect-error - Mongoose lean() has type inference issues
         _id: category._id.toString(),
       },
     });
@@ -125,6 +130,7 @@ export async function PATCH(
       success: true,
       category: {
         ...category,
+        // @ts-expect-error - Mongoose lean() has type inference issues
         _id: category._id.toString(),
       },
     });
@@ -138,7 +144,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

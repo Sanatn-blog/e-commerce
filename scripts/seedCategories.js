@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import { Schema, models, model, connect, connection } from "mongoose";
 
-const CategorySchema = new mongoose.Schema(
+const CategorySchema = new Schema(
   {
     name: {
       type: String,
@@ -23,7 +23,7 @@ const CategorySchema = new mongoose.Schema(
       default: "",
     },
     parentCategory: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Category",
       default: null,
     },
@@ -42,7 +42,7 @@ const CategorySchema = new mongoose.Schema(
 );
 
 const Category =
-  mongoose.models.Category || mongoose.model("Category", CategorySchema);
+  models.Category || model("Category", CategorySchema);
 
 const categories = [
   {
@@ -116,7 +116,7 @@ async function seedCategories() {
     const MONGODB_URI =
       process.env.MONGODB_URL || "mongodb://localhost:27017/ecommerce";
 
-    await mongoose.connect(MONGODB_URI);
+    await connect(MONGODB_URI);
     console.log("Connected to MongoDB");
 
     await Category.deleteMany({});
@@ -312,7 +312,7 @@ async function seedCategories() {
       `Total categories: ${createdParents.length + createdChildren.length}`
     );
 
-    await mongoose.connection.close();
+    await connection.close();
   } catch (error) {
     console.error("Error seeding categories:", error);
     process.exit(1);
