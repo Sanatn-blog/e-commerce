@@ -137,7 +137,19 @@ export default function PaymentPage() {
               status: "paid",
             };
 
-            console.log("Order placed:", orderData);
+            // Save order to database
+            const saveOrderResponse = await fetch("/api/customer/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(orderData),
+            });
+
+            if (!saveOrderResponse.ok) {
+              throw new Error("Failed to save order");
+            }
+
+            const { order } = await saveOrderResponse.json();
+            console.log("Order saved successfully:", order);
 
             // Clear cart and session storage
             clearCart();
@@ -190,7 +202,19 @@ export default function PaymentPage() {
           status: "pending",
         };
 
-        console.log("Order placed:", orderData);
+        // Save order to database
+        const saveOrderResponse = await fetch("/api/customer/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(orderData),
+        });
+
+        if (!saveOrderResponse.ok) {
+          throw new Error("Failed to save order");
+        }
+
+        const { order } = await saveOrderResponse.json();
+        console.log("Order saved successfully:", order);
 
         // Clear cart and session storage
         clearCart();

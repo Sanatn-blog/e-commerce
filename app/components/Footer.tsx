@@ -40,14 +40,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/products"
-                  className="text-sm hover:text-white transition-colors"
-                >
-                  Products
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/contact"
                   className="text-sm hover:text-white transition-colors"
                 >
@@ -85,6 +77,14 @@ export default function Footer() {
                   className="text-sm hover:text-white transition-colors"
                 >
                   FAQ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/privacy"
+                  className="text-sm hover:text-white transition-colors"
+                >
+                  Privacy Policy
                 </Link>
               </li>
             </ul>
@@ -183,14 +183,6 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/products"
-                    className="text-sm hover:text-white transition-colors"
-                  >
-                    Products
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     href="/contact"
                     className="text-sm hover:text-white transition-colors"
                   >
@@ -248,6 +240,14 @@ export default function Footer() {
                     className="text-sm hover:text-white transition-colors"
                   >
                     FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/privacy"
+                    className="text-sm hover:text-white transition-colors"
+                  >
+                    Privacy Policy
                   </Link>
                 </li>
               </ul>
