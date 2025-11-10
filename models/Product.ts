@@ -7,6 +7,7 @@ export interface IProduct extends Document {
   originalPrice?: number;
   discount?: number;
   category: string;
+  subcategory?: string;
   images: {
     public_id: string;
     url: string;
@@ -47,7 +48,10 @@ const ProductSchema = new Schema<IProduct>(
     category: {
       type: String,
       required: [true, "Please provide product category"],
-      enum: ["men", "women", "kids", "shoes", "accessories"],
+      enum: ["men", "women", "kids", "shoes", "accessories", "shirts"],
+    },
+    subcategory: {
+      type: String,
     },
     images: [
       {

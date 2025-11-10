@@ -208,19 +208,21 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
           />
         </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={4}
-            placeholder="Enter a brief description of this category..."
-            className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        {!formData.parentCategory && (
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              rows={4}
+              placeholder="Enter a brief description of this category..."
+              className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -255,28 +257,30 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
           />
         </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {imagePreview && (
-            <div className="mt-4">
-              <Image
-                src={imagePreview}
-                alt="Preview"
-                width={200}
-                height={200}
-                className="rounded object-cover"
-              />
-            </div>
-          )}
-        </div>
+        {!formData.parentCategory && (
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {imagePreview && (
+              <div className="mt-4">
+                <Image
+                  src={imagePreview}
+                  alt="Preview"
+                  width={200}
+                  height={200}
+                  className="rounded object-cover"
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="md:col-span-2">
           <label className="flex items-center">
@@ -304,7 +308,7 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
         </button>
         <button
           type="submit"
-          disabled={loading || !formData.image}
+          disabled={loading || (!formData.parentCategory && !formData.image)}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Saving..." : categoryId ? "Update" : "Create"}
