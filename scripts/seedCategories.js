@@ -41,8 +41,7 @@ const CategorySchema = new Schema(
   }
 );
 
-const Category =
-  models.Category || model("Category", CategorySchema);
+const Category = models.Category || model("Category", CategorySchema);
 
 const categories = [
   {

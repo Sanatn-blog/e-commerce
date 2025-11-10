@@ -141,7 +141,7 @@ export default function ProductsTable() {
                   {product.category}
                 </td>
                 <td className="py-4 px-6 text-sm text-gray-900">
-                  ₹{product.price.toFixed(2)}
+                  ${product.price.toFixed(2)}
                 </td>
                 <td className="py-4 px-6 text-sm text-gray-600">
                   {product.stock}

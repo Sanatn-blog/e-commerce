@@ -103,15 +103,15 @@ export default function AnalyticsPage() {
             <StatCard
               icon={DollarSign}
               title="Total Revenue"
-              value={`₹${overview.totalRevenue.toLocaleString()}`}
-              subtitle={`Completed: ₹${overview.completedRevenue.toLocaleString()}`}
+              value={`$${overview.totalRevenue.toLocaleString()}`}
+              subtitle={`Completed: $${overview.completedRevenue.toLocaleString()}`}
               color="bg-green-500"
             />
             <StatCard
               icon={ShoppingCart}
               title="Total Orders"
               value={overview.totalOrders.toString()}
-              subtitle={`Avg: ₹${overview.avgOrderValue.toFixed(2)}`}
+              subtitle={`Avg: $${overview.avgOrderValue.toFixed(2)}`}
               color="bg-blue-500"
             />
             <StatCard
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
                       </div>
                     </div>
                     <div className="w-32 text-right text-sm font-medium text-gray-900">
-                      ₹{month.revenue.toLocaleString()}
+                      ${month.revenue.toLocaleString()}
                     </div>
                   </div>
                 ))}
@@ -251,7 +251,7 @@ export default function AnalyticsPage() {
                         {product.quantity}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                        ₹{product.revenue.toLocaleString()}
+                        ${product.revenue.toLocaleString()}
                       </td>
                     </tr>
                   ))}

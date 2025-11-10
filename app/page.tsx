@@ -47,7 +47,10 @@ async function getProducts() {
 async function getCategories() {
   try {
     await connectDB();
-    const categories = await Category.find({ isActive: true })
+    const categories = await Category.find({
+      isActive: true,
+      parentCategory: null, // Only fetch main categories (no parent)
+    })
       .sort({ order: 1 })
       .lean();
 

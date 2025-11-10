@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import Customer from "@/models/Customer";
+import { notifyOrderDelivered } from "@/lib/notificationHelper";
 
 export async function GET() {
   try {
@@ -79,6 +80,11 @@ export async function PATCH(req: NextRequest) {
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    // Create notification when order is delivered
+    if (status === "delivered") {
+      await notifyOrderDelivered(order._id.toString(), order.orderNumber);
     }
 
     return NextResponse.json({ success: true, order });

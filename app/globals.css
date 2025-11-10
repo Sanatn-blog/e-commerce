@@ -134,3 +134,35 @@ body {
 .animate-shimmer {
   animation: shimmer 2s infinite;
 }
+
+/* Print Styles */
+@media print {
+  /* Hide navbar and footer when printing */
+  nav,
+  footer,
+  header {
+    display: none !important;
+  }
+
+  /* Hide elements with no-print class */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure body and main content take full width */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Remove shadows and borders for cleaner print */
+  * {
+    box-shadow: none !important;
+  }
+}

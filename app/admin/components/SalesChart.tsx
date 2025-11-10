@@ -24,7 +24,7 @@ export default function SalesChart() {
             ></div>
             <p className="text-xs text-gray-600 mt-2">{item.month}</p>
             <p className="text-xs text-gray-500">
-              ₹{(item.sales / 1000).toFixed(1)}k
+              ${(item.sales / 1000).toFixed(1)}k
             </p>
           </div>
         ))}

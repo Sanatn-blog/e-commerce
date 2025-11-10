@@ -2,7 +2,8 @@
 
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
-import { User, LogOut, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import { User, LogOut, ChevronDown, Package } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 export default function AuthButton() {
@@ -31,7 +32,7 @@ export default function AuthButton() {
   }
 
   if (customer) {
-    const profileImage = (customer as any).image || null;
+    const profileImage = (customer as { image?: string }).image || null;
 
     return (
       <div className="relative" ref={dropdownRef}>
@@ -41,9 +42,11 @@ export default function AuthButton() {
         >
           <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
             {profileImage ? (
-              <img
+              <Image
                 src={profileImage}
                 alt={customer.name || "Profile"}
+                width={36}
+                height={36}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -73,6 +76,14 @@ export default function AuthButton() {
             >
               <User size={18} />
               <span className="text-sm font-medium">View Profile</span>
+            </Link>
+            <Link
+              href="/orders"
+              className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+              onClick={() => setIsDropdownOpen(false)}
+            >
+              <Package size={18} />
+              <span className="text-sm font-medium">My Orders</span>
             </Link>
             <button
               onClick={() => {

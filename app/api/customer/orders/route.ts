@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { verifyCustomerToken } from "@/lib/customerAuth";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
+import { notifyNewOrder } from "@/lib/notificationHelper";
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,9 +20,14 @@ export async function GET(req: NextRequest) {
     }
 
     await connectDB();
+
+    console.log("Fetching orders for customer:", customer.customerId);
+
     const orders = await Order.find({ customerId: customer.customerId }).sort({
       createdAt: -1,
     });
+
+    console.log("Found orders:", orders.length);
 
     return NextResponse.json({ orders });
   } catch (error) {
@@ -47,6 +53,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    console.log("Customer creating order:", customer);
+
     const body = await req.json();
     const {
       items,
@@ -56,6 +64,12 @@ export async function POST(req: NextRequest) {
       total,
       status,
     } = body;
+
+    console.log("Order data received:", {
+      items: items?.length,
+      total,
+      paymentMethod,
+    });
 
     if (
       !items ||
@@ -80,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     // Map cart items to order items format
     const orderItems = items.map((item: any) => ({
-      productId: item.id || item.productId,
+      productId: item.productId || item.id || item._id,
       name: item.name,
       image: item.image,
       price: item.price,
@@ -110,13 +124,22 @@ export async function POST(req: NextRequest) {
       shipping: 0,
       tax: 0,
       total,
-      status: status || "pending",
+      status: "pending", // Valid values: pending, processing, shipped, delivered, cancelled
       shippingAddress,
       paymentMethod,
       paymentStatus: status === "paid" ? "paid" : "pending",
     });
 
     await order.save();
+
+    console.log("Order saved successfully:", {
+      id: order._id,
+      orderNumber: order.orderNumber,
+      customerId: order.customerId,
+    });
+
+    // Create notification for new order
+    await notifyNewOrder(order._id.toString(), order.orderNumber);
 
     return NextResponse.json({
       success: true,

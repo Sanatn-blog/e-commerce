@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     if (cartTotal < promoCode.minPurchaseAmount) {
       return NextResponse.json(
         {
-          error: `Minimum purchase amount of ₹${promoCode.minPurchaseAmount} required`,
+          error: `Minimum purchase amount of $${promoCode.minPurchaseAmount} required`,
         },
         { status: 400 }
       );

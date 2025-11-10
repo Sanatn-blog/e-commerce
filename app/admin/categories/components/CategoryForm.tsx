@@ -13,18 +13,19 @@ interface Category {
   _id: string;
   name: string;
   slug: string;
-  description: string;
-  image: string;
-  parentCategory?: string;
-  isActive: boolean;
-  order: number;
+  parentCategory?: {
+    _id: string;
+    name: string;
+  };
 }
 
 export default function CategoryForm({ categoryId }: CategoryFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [imageUploading, setImageUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -40,6 +41,7 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
     if (categoryId) {
       fetchCategory();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryId]);
 
   const fetchCategories = async () => {
@@ -47,12 +49,16 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
       const response = await fetch("/api/admin/categories");
       const data = await response.json();
       if (data.success) {
-        setCategories(
-          data.categories.filter((c: Category) => c._id !== categoryId)
+        // Filter out subcategories, only show parent categories
+        const parentCategories = data.categories.filter(
+          (cat: Category) => !cat.parentCategory
         );
+        setCategories(parentCategories);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
@@ -113,6 +119,7 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
     const formData = new FormData();
     formData.append("file", file);
 
+    setImageUploading(true);
     const loadingToast = toast.loading("Uploading image...");
     try {
       const response = await fetch("/api/upload", {
@@ -130,6 +137,8 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
     } catch (error) {
       console.error("Error uploading image:", error);
       toast.error("Failed to upload image", { id: loadingToast });
+    } finally {
+      setImageUploading(false);
     }
   };
 
@@ -194,7 +203,7 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
         </div>
 
         <div>
-          <label className=" block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Slug *
           </label>
           <input
@@ -208,39 +217,44 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
           />
         </div>
 
-        {!formData.parentCategory && (
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Enter a brief description of this category..."
-              className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        )}
-
-        <div>
+        <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Parent Category
+            Parent Category (Optional)
           </label>
           <select
             name="parentCategory"
             value={formData.parentCategory}
             onChange={handleChange}
-            className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loadingCategories}
+            className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <option value="">None (Top Level)</option>
-            {categories.map((category) => (
-              <option key={category._id} value={category._id}>
-                {category.name}
-              </option>
-            ))}
+            <option value="">None (Main Category)</option>
+            {categories
+              .filter((cat) => cat._id !== categoryId)
+              .map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
           </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Select a parent category to create a subcategory. Leave empty to
+            create a main category.
+          </p>
+        </div>
+
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Description
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            placeholder="Enter a brief description of this category..."
+            className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div>
@@ -266,9 +280,35 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={imageUploading}
+              className="text-gray-900 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             />
-            {imagePreview && (
+            {imageUploading && (
+              <div className="mt-4 flex items-center space-x-2 text-blue-600">
+                <svg
+                  className="animate-spin h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span className="text-sm font-medium">Uploading image...</span>
+              </div>
+            )}
+            {imagePreview && !imageUploading && (
               <div className="mt-4">
                 <Image
                   src={imagePreview}
@@ -308,7 +348,9 @@ export default function CategoryForm({ categoryId }: CategoryFormProps) {
         </button>
         <button
           type="submit"
-          disabled={loading || (!formData.parentCategory && !formData.image)}
+          disabled={
+            loading || imageUploading || !formData.name || !formData.slug
+          }
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Saving..." : categoryId ? "Update" : "Create"}

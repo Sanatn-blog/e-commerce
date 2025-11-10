@@ -3,8 +3,22 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
-import { Lock, User, MapPin, ArrowLeft } from "lucide-react";
+import { Lock, User, MapPin, ArrowLeft, Plus, Check } from "lucide-react";
 import Link from "next/link";
+
+interface SavedAddress {
+  _id: string;
+  label: string;
+  name: string;
+  phone: string;
+  address: string;
+  address2?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  landmark?: string;
+  isDefault: boolean;
+}
 
 interface CustomerDetails {
   name: string;
@@ -27,6 +41,11 @@ export default function CheckoutPage() {
   const [otp, setOtp] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
   const [error, setError] = useState("");
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    null
+  );
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({
     name: "",
     email: "",
@@ -62,6 +81,60 @@ export default function CheckoutPage() {
             email: data.customer.email || "",
             phone: data.customer.phone || "",
           }));
+
+          // Fetch saved addresses
+          fetch("/api/auth/addresses")
+            .then((res) => res.json())
+            .then((addressData) => {
+              console.log("Address data received:", addressData);
+              if (addressData.addresses && addressData.addresses.length > 0) {
+                console.log("Setting saved addresses:", addressData.addresses);
+                setSavedAddresses(addressData.addresses);
+
+                // Find and select default address
+                const defaultAddr = addressData.addresses.find(
+                  (addr: SavedAddress) => addr.isDefault
+                );
+                if (defaultAddr) {
+                  console.log("Found default address:", defaultAddr);
+                  setSelectedAddressId(defaultAddr._id);
+                  setCustomerDetails((prev) => ({
+                    ...prev,
+                    name: defaultAddr.name,
+                    phone: defaultAddr.phone,
+                    address: defaultAddr.address,
+                    address2: defaultAddr.address2 || "",
+                    city: defaultAddr.city,
+                    state: defaultAddr.state,
+                    zipCode: defaultAddr.zipCode,
+                    landmark: defaultAddr.landmark || "",
+                  }));
+                } else {
+                  // Select first address if no default
+                  console.log("No default, using first address");
+                  const firstAddr = addressData.addresses[0];
+                  setSelectedAddressId(firstAddr._id);
+                  setCustomerDetails((prev) => ({
+                    ...prev,
+                    name: firstAddr.name,
+                    phone: firstAddr.phone,
+                    address: firstAddr.address,
+                    address2: firstAddr.address2 || "",
+                    city: firstAddr.city,
+                    state: firstAddr.state,
+                    zipCode: firstAddr.zipCode,
+                    landmark: firstAddr.landmark || "",
+                  }));
+                }
+              } else {
+                console.log("No saved addresses, showing form");
+                setShowNewAddressForm(true);
+              }
+            })
+            .catch((err) => {
+              console.error("Error fetching addresses:", err);
+              setShowNewAddressForm(true);
+            });
         }
         setLoading(false);
       })
@@ -236,9 +309,65 @@ export default function CheckoutPage() {
     }
   };
 
+  const handleSelectAddress = (address: SavedAddress) => {
+    setSelectedAddressId(address._id);
+    setCustomerDetails((prev) => ({
+      ...prev,
+      name: address.name,
+      phone: address.phone,
+      address: address.address,
+      address2: address.address2 || "",
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode,
+      landmark: address.landmark || "",
+    }));
+    setShowNewAddressForm(false);
+  };
+
+  const handleSaveNewAddress = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const response = await fetch("/api/auth/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          label: "Home", // You can add a field for this
+          name: customerDetails.name,
+          phone: customerDetails.phone,
+          address: customerDetails.address,
+          address2: customerDetails.address2,
+          city: customerDetails.city,
+          state: customerDetails.state,
+          zipCode: customerDetails.zipCode,
+          landmark: customerDetails.landmark,
+          isDefault: savedAddresses.length === 0, // First address is default
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSavedAddresses(data.addresses);
+        setShowNewAddressForm(false);
+        // Select the newly added address
+        const newAddress = data.addresses[data.addresses.length - 1];
+        setSelectedAddressId(newAddress._id);
+      }
+    } catch {
+      setError("Failed to save address");
+    }
+  };
+
   const handleProceedToPayment = async () => {
     if (isLoggedIn) {
       if (!validateForm()) return;
+
+      // If using new address form, optionally save it
+      if (showNewAddressForm && savedAddresses.length > 0) {
+        // User is adding a new address, save it first
+        await handleSaveNewAddress();
+      }
 
       // Update profile with shipping details
       try {
@@ -361,104 +490,188 @@ export default function CheckoutPage() {
 
             {/* Shipping Address */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex items-center space-x-2 mb-6">
-                <MapPin size={24} className="text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">
-                  Shipping Address
-                </h2>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-2">
+                  <MapPin size={24} className="text-blue-600" />
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Shipping Address
+                  </h2>
+                </div>
+                {isLoggedIn &&
+                  savedAddresses.length > 0 &&
+                  !showNewAddressForm && (
+                    <button
+                      onClick={() => setShowNewAddressForm(true)}
+                      className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      <Plus size={16} />
+                      <span>Add New</span>
+                    </button>
+                  )}
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    House/Flat No., Building Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={customerDetails.address}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                    placeholder="e.g., Flat 101, Sunshine Apartments"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Area, Street, Sector, Village (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="address2"
-                    value={customerDetails.address2 || ""}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                    placeholder="e.g., Sector 15, MG Road"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Landmark (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    name="landmark"
-                    value={customerDetails.landmark || ""}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                    placeholder="e.g., Near City Hospital, Behind Metro Station"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      PIN Code *
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={customerDetails.zipCode}
-                      onChange={handleInputChange}
-                      maxLength={6}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                      placeholder="110001"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      City and State will auto-fill
-                    </p>
+              {/* Saved Addresses */}
+              {isLoggedIn &&
+                savedAddresses.length > 0 &&
+                !showNewAddressForm && (
+                  <div className="space-y-3 mb-6">
+                    {savedAddresses.map((address) => (
+                      <div
+                        key={address._id}
+                        onClick={() => handleSelectAddress(address)}
+                        className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                          selectedAddressId === address._id
+                            ? "border-blue-600 bg-blue-50"
+                            : "border-gray-300 hover:border-blue-400"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <span className="font-semibold text-gray-900">
+                                {address.label}
+                              </span>
+                              {address.isDefault && (
+                                <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-gray-900 font-medium">
+                              {address.name}
+                            </p>
+                            <p className="text-gray-600 text-sm">
+                              {address.phone}
+                            </p>
+                            <p className="text-gray-600 text-sm mt-1">
+                              {address.address}
+                              {address.address2 && `, ${address.address2}`}
+                              {address.landmark && `, ${address.landmark}`}
+                            </p>
+                            <p className="text-gray-600 text-sm">
+                              {address.city}, {address.state} -{" "}
+                              {address.zipCode}
+                            </p>
+                          </div>
+                          {selectedAddressId === address._id && (
+                            <div className="ml-4">
+                              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                                <Check size={16} className="text-white" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      City/District *
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={customerDetails.city}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                      placeholder="Mumbai"
-                    />
-                  </div>
+              {/* New Address Form or when no saved addresses */}
+              {(!isLoggedIn ||
+                showNewAddressForm ||
+                savedAddresses.length === 0) && (
+                <>
+                  {isLoggedIn && savedAddresses.length > 0 && (
+                    <button
+                      onClick={() => setShowNewAddressForm(false)}
+                      className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-4"
+                    >
+                      ← Back to saved addresses
+                    </button>
+                  )}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        House/Flat No., Building Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={customerDetails.address}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                        placeholder="e.g., Flat 101, Sunshine Apartments"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={customerDetails.state}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                      placeholder="Maharashtra"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Area, Street, Sector, Village (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        name="address2"
+                        value={customerDetails.address2 || ""}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                        placeholder="e.g., Sector 15, MG Road"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Landmark (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        name="landmark"
+                        value={customerDetails.landmark || ""}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                        placeholder="e.g., Near City Hospital, Behind Metro Station"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          PIN Code *
+                        </label>
+                        <input
+                          type="text"
+                          name="zipCode"
+                          value={customerDetails.zipCode}
+                          onChange={handleInputChange}
+                          maxLength={6}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                          placeholder="110001"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          City and State will auto-fill
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          City/District *
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={customerDetails.city}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                          placeholder="Mumbai"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          State *
+                        </label>
+                        <input
+                          type="text"
+                          name="state"
+                          value={customerDetails.state}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                          placeholder="Maharashtra"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
 
             {error && (
@@ -482,7 +695,7 @@ export default function CheckoutPage() {
                       {item.name} x {item.quantity}
                     </span>
                     <span className="text-gray-900 font-medium">
-                      ₹{(item.price * item.quantity).toFixed(2)}
+                      ${(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -491,22 +704,22 @@ export default function CheckoutPage() {
               <div className="border-t pt-4 space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span>
-                    {shipping === 0 ? "FREE" : `₹${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>GST (18%)</span>
-                  <span>₹{tax.toFixed(2)}</span>
+                  <span>${tax.toFixed(2)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Total</span>
-                    <span>₹{total.toFixed(2)}</span>
+                    <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

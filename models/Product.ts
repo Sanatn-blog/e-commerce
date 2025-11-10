@@ -48,7 +48,6 @@ const ProductSchema = new Schema<IProduct>(
     category: {
       type: String,
       required: [true, "Please provide product category"],
-      enum: ["men", "women", "kids", "shoes", "accessories", "shirts"],
     },
     subcategory: {
       type: String,
@@ -79,7 +78,14 @@ const ProductSchema = new Schema<IProduct>(
   }
 );
 
-const Product: Model<IProduct> =
-  mongoose.models.Product || mongoose.model<IProduct>("Product", ProductSchema);
+// Delete the cached model to ensure schema updates are applied
+if (mongoose.models.Product) {
+  delete mongoose.models.Product;
+}
+
+const Product: Model<IProduct> = mongoose.model<IProduct>(
+  "Product",
+  ProductSchema
+);
 
 export default Product;

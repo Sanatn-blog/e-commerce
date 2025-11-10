@@ -12,7 +12,7 @@ A complete promo code management system has been added to the admin panel, allow
 - **Description**: Optional description for internal reference
 - **Discount Type**:
   - Percentage (%) discount
-  - Fixed amount (₹) discount
+  - Fixed amount ($) discount
 - **Discount Value**: The discount amount or percentage
 - **Min Purchase Amount**: Minimum cart value required to use the code
 - **Max Discount Amount**: Optional cap on the discount (useful for percentage discounts)
@@ -78,25 +78,25 @@ Fields:
 - Code: SUMMER20
 - Type: Percentage
 - Value: 20%
-- Min Purchase: ₹1000
-- Max Discount: ₹500
-- Result: 20% off on orders above ₹1000, capped at ₹500 discount
+- Min Purchase: $1000
+- Max Discount: $500
+- Result: 20% off on orders above $1000, capped at $500 discount
 
 ### Example 2: Fixed Discount
 
 - Code: FLAT100
 - Type: Fixed
-- Value: ₹100
-- Min Purchase: ₹500
-- Result: ₹100 off on orders above ₹500
+- Value: $100
+- Min Purchase: $500
+- Result: $100 off on orders above $500
 
 ### Example 3: Limited Usage
 
 - Code: FIRST50
 - Type: Fixed
-- Value: ₹50
+- Value: $50
 - Usage Limit: 100
-- Result: First 100 customers get ₹50 off
+- Result: First 100 customers get $50 off
 
 ## Integration Notes
 

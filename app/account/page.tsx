@@ -17,6 +17,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { useWishlist } from "../context/WishlistContext";
+import { useCart } from "../context/CartContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import ImageCropModal from "../components/ImageCropModal";
@@ -26,14 +27,14 @@ import Image from "next/image";
 interface Address {
   _id: string;
   label: string;
-  fullName: string;
+  name: string;
   phone: string;
-  addressLine1: string;
-  addressLine2?: string;
+  address: string;
+  address2?: string;
   city: string;
   state: string;
   zipCode: string;
-  country: string;
+  landmark?: string;
   isDefault: boolean;
 }
 
@@ -60,6 +61,7 @@ export default function AccountPage() {
   const { customer, loading, logout, refreshCustomer } = useAuth();
   const { success, error } = useToast();
   const { wishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const router = useRouter();
   const [showCropModal, setShowCropModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -80,6 +82,15 @@ export default function AccountPage() {
   }, [customer, loading, router]);
 
   useEffect(() => {
+    // Check for section query parameter
+    const params = new URLSearchParams(window.location.search);
+    const section = params.get("section");
+    if (section) {
+      setActiveSection(section);
+    }
+  }, []);
+
+  useEffect(() => {
     console.log("Customer state updated:", customer);
     if (customer?.image) {
       console.log("Profile image URL:", customer.image);
@@ -88,21 +99,16 @@ export default function AccountPage() {
     }
   }, [customer]);
 
-  useEffect(() => {
-    if (activeSection === "orders" && orders.length === 0) {
-      fetchOrders();
-    } else if (activeSection === "addresses" && addresses.length === 0) {
-      fetchAddresses();
-    }
-  }, [activeSection, addresses.length, orders.length]);
-
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
       const response = await fetch("/api/customer/orders");
       const data = await response.json();
+      console.log("Orders response:", data);
       if (response.ok) {
-        setOrders(data.orders);
+        setOrders(data.orders || []);
+      } else {
+        console.error("Failed to fetch orders:", data);
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
@@ -111,12 +117,20 @@ export default function AccountPage() {
     }
   };
 
+  useEffect(() => {
+    if (activeSection === "orders") {
+      fetchOrders();
+    } else if (activeSection === "addresses") {
+      fetchAddresses();
+    }
+  }, [activeSection]);
+
   const fetchAddresses = async () => {
     setLoadingAddresses(true);
     try {
-      const response = await fetch("/api/customer/addresses");
+      const response = await fetch("/api/auth/addresses");
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.addresses) {
         setAddresses(data.addresses);
       }
     } catch (err) {
@@ -130,13 +144,14 @@ export default function AccountPage() {
     if (!confirm("Are you sure you want to delete this address?")) return;
 
     try {
-      const response = await fetch(`/api/customer/addresses/${id}`, {
+      const response = await fetch(`/api/auth/addresses?addressId=${id}`, {
         method: "DELETE",
       });
 
-      if (response.ok) {
+      const data = await response.json();
+      if (response.ok && data.success) {
         success("Address deleted successfully");
-        setAddresses(addresses.filter((addr) => addr._id !== id));
+        setAddresses(data.addresses);
       } else {
         error("Failed to delete address");
       }
@@ -147,18 +162,19 @@ export default function AccountPage() {
 
   const handleSaveAddress = async (addressData: Partial<Address>) => {
     try {
-      const url = editingAddress
-        ? `/api/customer/addresses/${editingAddress._id}`
-        : "/api/customer/addresses";
       const method = editingAddress ? "PUT" : "POST";
+      const body = editingAddress
+        ? { addressId: editingAddress._id, ...addressData }
+        : addressData;
 
-      const response = await fetch(url, {
+      const response = await fetch("/api/auth/addresses", {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(addressData),
+        body: JSON.stringify(body),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+      if (response.ok && data.success) {
         success(
           editingAddress
             ? "Address updated successfully"
@@ -166,9 +182,9 @@ export default function AccountPage() {
         );
         setShowAddressModal(false);
         setEditingAddress(null);
-        fetchAddresses();
+        setAddresses(data.addresses);
       } else {
-        error("Failed to save address");
+        error(data.error || "Failed to save address");
       }
     } catch {
       error("Failed to save address");
@@ -489,9 +505,10 @@ export default function AccountPage() {
                 ) : (
                   <div className="space-y-4">
                     {orders.map((order) => (
-                      <div
+                      <Link
                         key={order._id}
-                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                        href={`/orders/${order._id}`}
+                        className="block border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all"
                       >
                         <div className="flex justify-between items-start mb-3">
                           <div>
@@ -511,7 +528,7 @@ export default function AccountPage() {
                           </span>
                         </div>
                         <div className="space-y-3">
-                          {order.items.map((item, idx) => (
+                          {order.items.slice(0, 2).map((item, idx) => (
                             <div
                               key={idx}
                               className="flex items-center space-x-4"
@@ -538,6 +555,12 @@ export default function AccountPage() {
                               </p>
                             </div>
                           ))}
+                          {order.items.length > 2 && (
+                            <p className="text-sm text-gray-500 text-center">
+                              +{order.items.length - 2} more item
+                              {order.items.length - 2 > 1 ? "s" : ""}
+                            </p>
+                          )}
                         </div>
                         <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
                           <span className="text-gray-600">Total</span>
@@ -545,7 +568,7 @@ export default function AccountPage() {
                             ${order.total.toFixed(2)}
                           </span>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -621,22 +644,24 @@ export default function AccountPage() {
                           {address.label}
                         </p>
                         <p className="text-sm text-gray-600 mt-1">
-                          {address.fullName}
+                          {address.name}
                         </p>
                         <p className="text-sm text-gray-600">{address.phone}</p>
                         <p className="text-sm text-gray-600 mt-2">
-                          {address.addressLine1}
+                          {address.address}
                         </p>
-                        {address.addressLine2 && (
+                        {address.address2 && (
                           <p className="text-sm text-gray-600">
-                            {address.addressLine2}
+                            {address.address2}
+                          </p>
+                        )}
+                        {address.landmark && (
+                          <p className="text-sm text-gray-600">
+                            {address.landmark}
                           </p>
                         )}
                         <p className="text-sm text-gray-600">
-                          {address.city}, {address.state} {address.zipCode}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {address.country}
+                          {address.city}, {address.state} - {address.zipCode}
                         </p>
                       </div>
                     ))}
@@ -708,11 +733,31 @@ export default function AccountPage() {
                               <Trash2 size={18} />
                             </button>
                           </div>
-                          <Link href={`/product/${item._id}`}>
-                            <button className="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                              View Product
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={() => {
+                                addToCart({
+                                  _id: item._id,
+                                  name: item.name,
+                                  price: item.price,
+                                  image: item.image,
+                                  category: item.category,
+                                });
+                                success("Added to cart");
+                              }}
+                              className="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                            >
+                              Add to Cart
                             </button>
-                          </Link>
+                            <Link
+                              href={`/product/${item._id}`}
+                              className="flex-1"
+                            >
+                              <button className="w-full px-3 py-1.5 text-sm border border-blue-600 text-blue-600 rounded-md hover:bg-blue-50 transition">
+                                View Product
+                              </button>
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -783,15 +828,15 @@ function AddressModal({
   onClose: () => void;
 }) {
   const [formData, setFormData] = useState({
-    label: address?.label || "",
-    fullName: address?.fullName || "",
+    label: address?.label || "Home",
+    name: address?.name || "",
     phone: address?.phone || "",
-    addressLine1: address?.addressLine1 || "",
-    addressLine2: address?.addressLine2 || "",
+    address: address?.address || "",
+    address2: address?.address2 || "",
     city: address?.city || "",
     state: address?.state || "",
     zipCode: address?.zipCode || "",
-    country: address?.country || "United States",
+    landmark: address?.landmark || "",
     isDefault: address?.isDefault || false,
   });
 
@@ -818,35 +863,39 @@ function AddressModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Label (e.g., Home, Office)
+                Address Label *
               </label>
-              <input
-                type="text"
+              <select
                 required
                 value={formData.label}
                 onChange={(e) =>
                   setFormData({ ...formData, label: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              >
+                <option value="Home">Home</option>
+                <option value="Office">Office</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
+                Full Name *
               </label>
               <input
                 type="text"
                 required
-                value={formData.fullName}
+                value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
+                  setFormData({ ...formData, name: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="John Doe"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone
+                Phone Number *
               </label>
               <input
                 type="tel"
@@ -855,39 +904,73 @@ function AddressModal({
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
+                maxLength={10}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="9876543210"
               />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address Line 1
+                House/Flat No., Building Name *
               </label>
               <input
                 type="text"
                 required
-                value={formData.addressLine1}
+                value={formData.address}
                 onChange={(e) =>
-                  setFormData({ ...formData, addressLine1: e.target.value })
+                  setFormData({ ...formData, address: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Flat 101, Sunshine Apartments"
               />
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address Line 2 (Optional)
+                Area, Street, Sector (Optional)
               </label>
               <input
                 type="text"
-                value={formData.addressLine2}
+                value={formData.address2}
                 onChange={(e) =>
-                  setFormData({ ...formData, addressLine2: e.target.value })
+                  setFormData({ ...formData, address2: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Sector 15, MG Road"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Landmark (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.landmark}
+                onChange={(e) =>
+                  setFormData({ ...formData, landmark: e.target.value })
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g., Near City Hospital"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                City
+                PIN Code *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.zipCode}
+                onChange={(e) =>
+                  setFormData({ ...formData, zipCode: e.target.value })
+                }
+                maxLength={6}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="110001"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                City *
               </label>
               <input
                 type="text"
@@ -897,11 +980,12 @@ function AddressModal({
                   setFormData({ ...formData, city: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Mumbai"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                State
+                State *
               </label>
               <input
                 type="text"
@@ -911,34 +995,7 @@ function AddressModal({
                   setFormData({ ...formData, state: e.target.value })
                 }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                ZIP Code
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.zipCode}
-                onChange={(e) =>
-                  setFormData({ ...formData, zipCode: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Country
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.country}
-                onChange={(e) =>
-                  setFormData({ ...formData, country: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Maharashtra"
               />
             </div>
             <div className="md:col-span-2">

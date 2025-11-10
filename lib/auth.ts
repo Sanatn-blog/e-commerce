@@ -48,3 +48,25 @@ export async function clearSession() {
   const cookieStore = await cookies();
   cookieStore.delete("admin-token");
 }
+
+export async function verifyAdminToken(request: Request) {
+  try {
+    const cookieHeader = request.headers.get("cookie");
+    if (!cookieHeader) return null;
+
+    const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split("=");
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    const token = cookies["admin-token"];
+    if (!token) return null;
+
+    const payload = await verifyToken(token);
+    return payload?.adminId as string | null;
+  } catch (error) {
+    console.error("Error verifying admin token:", error);
+    return null;
+  }
+}

@@ -5,7 +5,7 @@ import Product from "@/models/Product";
 async function getMenProducts() {
   try {
     await connectDB();
-    const products = await Product.find({ category: "men" })
+    const products = await Product.find({ category: "mens-clothing" })
       .sort({ createdAt: -1 })
       .lean();
     return products.map((product) => ({
@@ -43,7 +43,7 @@ export default async function Men() {
 
       <CategoryProductsClient
         initialProducts={menProducts}
-        category="men"
+        category="mens-clothing"
         subcategories={["Shirts", "Pants", "Outerwear", "Footwear"]}
         ringColor="blue"
       />

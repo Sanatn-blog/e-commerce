@@ -15,7 +15,7 @@
   - Current price (large, bold)
   - Original price (strikethrough) when available
   - Discount percentage badge (green) when applicable
-- Example: ₹799 ~~₹1299~~ [38% OFF]
+- Example: $799 ~~$1299~~ [38% OFF]
 
 ### 3. Admin Panel - Add Product (app/admin/products/add/page.tsx)
 
@@ -68,9 +68,9 @@
 
 ### Example Scenarios:
 
-1. **No Discount**: Price = ₹999 → Displays: ₹999
-2. **With Discount**: Price = ₹799, Original = ₹1299, Discount = 38% → Displays: ₹799 ~~₹1299~~ [38% OFF]
-3. **Sale Item**: Price = ₹499, Original = ₹999 → Displays: ₹499 ~~₹999~~ (auto-calculates 50% off badge)
+1. **No Discount**: Price = $999 → Displays: $999
+2. **With Discount**: Price = $799, Original = $1299, Discount = 38% → Displays: $799 ~~$1299~~ [38% OFF]
+3. **Sale Item**: Price = $499, Original = $999 → Displays: $499 ~~$999~~ (auto-calculates 50% off badge)
 
 ## Notes
 

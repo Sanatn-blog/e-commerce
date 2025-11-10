@@ -82,8 +82,8 @@ export default function SeedImagesPage() {
           </h1>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-gray-600 mb-4">
-              This utility will add placeholder images to categories that don't
-              have images yet.
+              This utility will add placeholder images to categories that
+              don&apos;t have images yet.
             </p>
             <p className="text-gray-600 mb-6">
               The following categories will be updated:

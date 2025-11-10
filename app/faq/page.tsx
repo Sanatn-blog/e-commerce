@@ -188,8 +188,8 @@ export default function FAQPage() {
             Still Have Questions?
           </h2>
           <p className="text-gray-700 mb-6">
-            Can&apos;t find the answer you&apos;re looking for? Our customer service team
-            is here to help!
+            Can&apos;t find the answer you&apos;re looking for? Our customer
+            service team is here to help!
           </p>
           <a
             href="/contact"

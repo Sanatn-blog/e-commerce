@@ -106,7 +106,7 @@ export default function RecentOrders() {
                   {order.customer.name}
                 </td>
                 <td className="py-3 px-4 text-sm text-gray-900">
-                  ₹{order.total.toFixed(2)}
+                  ${order.total.toFixed(2)}
                 </td>
                 <td className="py-3 px-4">
                   <span

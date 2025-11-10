@@ -13,6 +13,7 @@ import {
   Image,
   Ticket,
   MessageSquare,
+  Mail,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
   { icon: Users, label: "Customers", href: "/admin/customers" },
   { icon: Tag, label: "Categories", href: "/admin/categories" },
   { icon: Ticket, label: "Promo Codes", href: "/admin/promo-codes" },
+  { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
   { icon: MessageSquare, label: "Contact Messages", href: "/admin/contacts" },
   { icon: Image, label: "Carousel", href: "/admin/carousel" },
   { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },

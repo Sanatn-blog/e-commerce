@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { refreshCustomer } = useAuth();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
@@ -71,6 +73,8 @@ export default function RegisterPage() {
         throw new Error(data.error || "Invalid OTP");
       }
 
+      // Refresh customer data in AuthContext
+      await refreshCustomer();
       router.push("/");
       router.refresh();
     } catch (err) {

@@ -104,7 +104,7 @@ export default function AddPromoCodePage() {
                     className="text-gray-900 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Amount (₹)</option>
+                    <option value="fixed">Fixed Amount ($)</option>
                   </select>
                 </div>
               </div>
@@ -155,7 +155,7 @@ export default function AddPromoCodePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Discount Amount (₹)
+                    Max Discount Amount ($)
                   </label>
                   <input
                     type="number"
@@ -180,7 +180,7 @@ export default function AddPromoCodePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minimum Purchase Amount (₹) *
+                    Minimum Purchase Amount ($) *
                   </label>
                   <input
                     type="number"

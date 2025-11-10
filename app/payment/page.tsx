@@ -158,10 +158,10 @@ export default function PaymentPage() {
 
             setOrderPlaced(true);
 
-            // Redirect to success page after 3 seconds
+            // Redirect to orders page after 2 seconds
             setTimeout(() => {
-              router.push("/");
-            }, 3000);
+              router.push("/account?section=orders");
+            }, 2000);
           } catch (err: any) {
             setError(err.message || "Payment verification failed");
             setProcessing(false);
@@ -223,10 +223,10 @@ export default function PaymentPage() {
 
         setOrderPlaced(true);
 
-        // Redirect to success page after 3 seconds
+        // Redirect to orders page after 2 seconds
         setTimeout(() => {
-          router.push("/");
-        }, 3000);
+          router.push("/account?section=orders");
+        }, 2000);
       } catch (err: any) {
         setError("Order placement failed. Please try again.");
         setProcessing(false);
@@ -262,13 +262,13 @@ export default function PaymentPage() {
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-600 mb-1">Order Total</p>
-              <p className="text-3xl font-bold text-gray-900">₹{orderTotal}</p>
+              <p className="text-3xl font-bold text-gray-900">${orderTotal}</p>
             </div>
             <Link
-              href="/"
+              href="/account?section=orders"
               className="inline-block w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
             >
-              Continue Shopping
+              View Orders
             </Link>
           </div>
         </div>
@@ -418,7 +418,7 @@ export default function PaymentPage() {
                       {item.name} x {item.quantity}
                     </span>
                     <span className="text-gray-900 font-medium">
-                      ₹{(item.price * item.quantity).toFixed(2)}
+                      ${(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -427,7 +427,7 @@ export default function PaymentPage() {
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold text-gray-900">
                   <span>Total</span>
-                  <span>₹{orderTotal}</span>
+                  <span>${orderTotal}</span>
                 </div>
               </div>
 

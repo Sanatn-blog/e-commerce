@@ -33,6 +33,13 @@ export default function CategoryProductsClient({
   const [sortBy, setSortBy] = useState("featured");
   const [loading, setLoading] = useState(false);
 
+  // Filter subcategories to only show those that exist in products
+  const existingSubcategories = subcategories.filter((sub) =>
+    initialProducts.some(
+      (product) => product.subcategory?.toLowerCase() === sub.toLowerCase()
+    )
+  );
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -101,7 +108,7 @@ export default function CategoryProductsClient({
               className={`px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-${ringColor}-500 text-gray-700`}
             >
               <option value="all">All Categories</option>
-              {subcategories.map((sub) => (
+              {existingSubcategories.map((sub) => (
                 <option key={sub} value={sub.toLowerCase()}>
                   {sub}
                 </option>
