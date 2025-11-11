@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/app/components/ProductCard";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { useCart } from "@/app/context/CartContext";
 import { useToast } from "@/app/context/ToastContext";
+import { useAuth } from "@/app/context/AuthContext";
+import ShareButton from "@/app/components/ShareButton";
+import ReviewForm from "@/app/components/ReviewForm";
+import ReviewList from "@/app/components/ReviewList";
 
 interface ProductImage {
   public_id: string;
@@ -25,6 +29,16 @@ interface Product {
   stock: number;
   sizes?: string[];
   colors?: string[];
+}
+
+interface Review {
+  _id: string;
+  customerName: string;
+  rating: number;
+  title: string;
+  comment: string;
+  verified: boolean;
+  createdAt: string;
 }
 
 interface ProductDetailClientProps {
@@ -46,10 +60,78 @@ export default function ProductDetailClient({
   const [shakeButton, setShakeButton] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
+  // Review states
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [canReview, setCanReview] = useState(false);
+  const [orderId, setOrderId] = useState("");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+
+  const { customer } = useAuth();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { success, error } = useToast();
   const inWishlist = isInWishlist(product._id);
+
+  const fetchReviews = async () => {
+    try {
+      setLoadingReviews(true);
+      const response = await fetch(`/api/reviews?productId=${product._id}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setReviews(data.reviews);
+        setAverageRating(data.averageRating);
+        setTotalReviews(data.totalReviews);
+      }
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  const checkReviewEligibility = async () => {
+    try {
+      const response = await fetch(
+        `/api/reviews/check-eligibility?productId=${product._id}`
+      );
+      const data = await response.json();
+
+      if (response.ok && data.canReview) {
+        setCanReview(true);
+        setOrderId(data.orderId);
+      } else {
+        setCanReview(false);
+      }
+    } catch (err) {
+      console.error("Error checking eligibility:", err);
+      setCanReview(false);
+    }
+  };
+
+  const handleReviewSuccess = () => {
+    setShowReviewForm(false);
+    setCanReview(false);
+    fetchReviews();
+    success("Review submitted successfully!");
+  };
+
+  // Fetch reviews
+  useEffect(() => {
+    fetchReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product._id]);
+
+  // Check review eligibility
+  useEffect(() => {
+    if (customer) {
+      checkReviewEligibility();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customer, product._id]);
 
   const handleAddToCart = () => {
     // Validation: Check if size is required but not selected
@@ -213,7 +295,9 @@ export default function ProductDetailClient({
                   <svg
                     key={i}
                     className={`w-5 h-5 ${
-                      i < 4 ? "fill-current" : "fill-gray-300"
+                      i < Math.round(averageRating)
+                        ? "fill-current"
+                        : "fill-gray-300"
                     }`}
                     viewBox="0 0 20 20"
                   >
@@ -221,7 +305,13 @@ export default function ProductDetailClient({
                   </svg>
                 ))}
               </div>
-              <span className="text-sm text-gray-600 ml-2">(128 reviews)</span>
+              <span className="text-sm text-gray-600 ml-2">
+                {totalReviews > 0
+                  ? `${averageRating.toFixed(1)} (${totalReviews} review${
+                      totalReviews !== 1 ? "s" : ""
+                    })`
+                  : "No reviews yet"}
+              </span>
             </div>
 
             {/* Price */}
@@ -397,6 +487,12 @@ export default function ProductDetailClient({
                 />
               </svg>
             </button>
+            <ShareButton
+              productName={product.name}
+              productUrl={
+                typeof window !== "undefined" ? window.location.href : ""
+              }
+            />
           </div>
 
           {/* Product Features */}
@@ -475,7 +571,7 @@ export default function ProductDetailClient({
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Reviews (128)
+              Reviews ({totalReviews})
             </button>
           </div>
         </div>
@@ -488,7 +584,48 @@ export default function ProductDetailClient({
           </div>
         ) : (
           <div className="space-y-6">
-            <p className="text-gray-600">Reviews coming soon...</p>
+            {/* Write Review Button */}
+            {customer && canReview && !showReviewForm && (
+              <button
+                onClick={() => setShowReviewForm(true)}
+                className="bg-rose-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-rose-700 transition"
+              >
+                Write a Review
+              </button>
+            )}
+
+            {!customer && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
+                <Link href="/login" className="font-semibold hover:underline">
+                  Log in
+                </Link>{" "}
+                to write a review
+              </div>
+            )}
+
+            {/* Review Form */}
+            {showReviewForm && (
+              <ReviewForm
+                productId={product._id}
+                orderId={orderId}
+                onSuccess={handleReviewSuccess}
+                onCancel={() => setShowReviewForm(false)}
+              />
+            )}
+
+            {/* Reviews List */}
+            {loadingReviews ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-rose-600"></div>
+                <p className="text-gray-600 mt-2">Loading reviews...</p>
+              </div>
+            ) : (
+              <ReviewList
+                reviews={reviews}
+                averageRating={averageRating}
+                totalReviews={totalReviews}
+              />
+            )}
           </div>
         )}
       </div>

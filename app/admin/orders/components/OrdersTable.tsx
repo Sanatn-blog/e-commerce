@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Eye, RefreshCw, X, Search, Filter } from "lucide-react";
 
 interface Order {
@@ -28,6 +29,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function OrdersTable() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,6 +60,30 @@ export default function OrdersTable() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  // Handle orderId from notification
+  useEffect(() => {
+    const orderId = searchParams.get("orderId");
+    if (orderId && orders.length > 0) {
+      const order = orders.find((o) => o.id === orderId);
+      if (order) {
+        setSelectedOrder(order);
+        // Scroll to the order row
+        setTimeout(() => {
+          const orderRow = document.querySelector(
+            `[data-order-id="${orderId}"]`
+          );
+          if (orderRow) {
+            orderRow.scrollIntoView({ behavior: "smooth", block: "center" });
+            orderRow.classList.add("bg-blue-100");
+            setTimeout(() => {
+              orderRow.classList.remove("bg-blue-100");
+            }, 2000);
+          }
+        }, 100);
+      }
+    }
+  }, [searchParams, orders]);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
@@ -266,7 +292,8 @@ export default function OrdersTable() {
                 {groupedOrders[date].map((order) => (
                   <tr
                     key={order.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
+                    data-order-id={order.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     <td className="py-4 px-6 text-sm font-medium text-gray-900">
                       {order.orderNumber}
@@ -351,7 +378,7 @@ export default function OrdersTable() {
       )}
 
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
               <h3 className="text-xl font-semibold text-gray-900">

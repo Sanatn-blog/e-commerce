@@ -21,6 +21,8 @@ interface Notification {
   message: string;
   unread: boolean;
   createdAt: string;
+  relatedId?: string;
+  relatedModel?: string;
 }
 
 export default function AdminHeader() {
@@ -98,6 +100,29 @@ export default function AdminHeader() {
       console.error("Error fetching notifications:", error);
     }
   }, []);
+
+  const handleNotificationClick = (notification: Notification) => {
+    // Mark as read
+    if (notification.unread) {
+      markAsRead(notification._id);
+    }
+
+    // Redirect based on notification type and relatedId
+    if (notification.relatedId && notification.relatedModel) {
+      setShowNotifications(false);
+
+      switch (notification.relatedModel) {
+        case "Order":
+          router.push(`/admin/orders?orderId=${notification.relatedId}`);
+          break;
+        case "Product":
+          router.push(`/admin/products?productId=${notification.relatedId}`);
+          break;
+        default:
+          break;
+      }
+    }
+  };
 
   const markAsRead = async (id: string) => {
     try {
@@ -254,9 +279,7 @@ export default function AdminHeader() {
                       return (
                         <div
                           key={notification._id}
-                          onClick={() =>
-                            notification.unread && markAsRead(notification._id)
-                          }
+                          onClick={() => handleNotificationClick(notification)}
                           className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
                             notification.unread ? "bg-blue-50/30" : ""
                           }`}
@@ -289,7 +312,13 @@ export default function AdminHeader() {
                 </div>
 
                 <div className="p-3 border-t border-gray-200">
-                  <button className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
+                  <button
+                    onClick={() => {
+                      setShowNotifications(false);
+                      router.push("/admin/notifications");
+                    }}
+                    className="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
                     View All Notifications
                   </button>
                 </div>

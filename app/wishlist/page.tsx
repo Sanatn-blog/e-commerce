@@ -8,6 +8,42 @@ import Image from "next/image";
 export default function WishlistPage() {
   const { wishlist, removeFromWishlist } = useWishlist();
 
+  const handleShareWishlist = async () => {
+    const wishlistUrl = window.location.href;
+    const shareText = `Check out my wishlist with ${wishlist.length} amazing items!`;
+
+    // Check if Web Share API is available
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My Wishlist",
+          text: shareText,
+          url: wishlistUrl,
+        });
+      } catch (error) {
+        // User cancelled or error occurred
+        if ((error as Error).name !== "AbortError") {
+          console.error("Error sharing:", error);
+          copyToClipboard(wishlistUrl);
+        }
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      copyToClipboard(wishlistUrl);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        alert("Wishlist link copied to clipboard!");
+      },
+      (err) => {
+        console.error("Could not copy text: ", err);
+      }
+    );
+  };
+
   return (
     <main className="grow py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,8 +53,14 @@ export default function WishlistPage() {
             <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
             <p className="text-gray-600 mt-2">{wishlist.length} items saved</p>
           </div>
-          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700">
-            <Share2 size={20} />
+          <button
+            onClick={handleShareWishlist}
+            className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-blue-50 hover:border-blue-400 hover:text-blue-600 text-gray-700 transition-all duration-200 active:scale-95 hover:shadow-md"
+          >
+            <Share2
+              size={20}
+              className="transition-transform duration-200 group-hover:rotate-12"
+            />
             <span>Share Wishlist</span>
           </button>
         </div>
