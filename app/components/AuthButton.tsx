@@ -6,7 +6,11 @@ import Image from "next/image";
 import { User, LogOut, ChevronDown, Package } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
-export default function AuthButton() {
+export default function AuthButton({
+  onNavigate,
+}: {
+  onNavigate?: () => void;
+}) {
   const { customer, loading, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -106,12 +110,14 @@ export default function AuthButton() {
       <Link
         href="/login"
         className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition"
+        onClick={onNavigate}
       >
         Login
       </Link>
       <Link
         href="/register"
         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
+        onClick={onNavigate}
       >
         Register
       </Link>

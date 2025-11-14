@@ -138,8 +138,9 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         <div
-          className={`lg:hidden border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-            }`}
+          className={`lg:hidden border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
+            isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
         >
           <div className="py-4 space-y-1 bg-gradient-to-b from-white to-gray-50">
             <Link
@@ -183,7 +184,7 @@ export default function Navbar() {
               </span>
             </Link>
             <div className="sm:hidden px-4 py-3 border-t border-gray-200 mt-2 pt-4">
-              <AuthButton />
+              <AuthButton onNavigate={closeMobileMenu} />
             </div>
           </div>
         </div>
