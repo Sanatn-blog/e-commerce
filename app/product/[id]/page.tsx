@@ -15,6 +15,11 @@ async function getProduct(id: string) {
     return {
       ...product,
       _id: product._id.toString(),
+      images:
+        product.images?.map((img: { public_id: string; url: string }) => ({
+          public_id: img.public_id,
+          url: img.url,
+        })) || [],
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
     };
@@ -37,6 +42,11 @@ async function getRelatedProducts(category: string, currentId: string) {
     return products.map((product) => ({
       ...product,
       _id: product._id.toString(),
+      images:
+        product.images?.map((img: { public_id: string; url: string }) => ({
+          public_id: img.public_id,
+          url: img.url,
+        })) || [],
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
     }));

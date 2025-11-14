@@ -25,11 +25,24 @@ export async function GET(request: NextRequest) {
     else if (sortBy === "price-desc") sort = { price: -1 };
     else if (sortBy === "rating") sort = { rating: -1 };
 
-    const products = await Product.find(query).sort(sort);
+    const products = await Product.find(query).sort(sort).lean();
+
+    // Serialize products
+    const serializedProducts = products.map((product: any) => ({
+      ...product,
+      _id: product._id.toString(),
+      images:
+        product.images?.map((img: { public_id: string; url: string }) => ({
+          public_id: img.public_id,
+          url: img.url,
+        })) || [],
+      createdAt: product.createdAt?.toISOString(),
+      updatedAt: product.updatedAt?.toISOString(),
+    }));
 
     return NextResponse.json({
       success: true,
-      products,
+      products: serializedProducts,
     });
   } catch (error) {
     console.error("Error fetching products:", error);

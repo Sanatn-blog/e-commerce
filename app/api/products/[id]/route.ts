@@ -10,7 +10,7 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).lean();
 
     if (!product) {
       return NextResponse.json(
@@ -19,9 +19,22 @@ export async function GET(
       );
     }
 
+    // Serialize MongoDB document
+    const serializedProduct = {
+      ...product,
+      _id: product._id.toString(),
+      images:
+        product.images?.map((img: { public_id: string; url: string }) => ({
+          public_id: img.public_id,
+          url: img.url,
+        })) || [],
+      createdAt: product.createdAt.toISOString(),
+      updatedAt: product.updatedAt.toISOString(),
+    };
+
     return NextResponse.json({
       success: true,
-      product,
+      product: serializedProduct,
     });
   } catch (error) {
     return NextResponse.json(

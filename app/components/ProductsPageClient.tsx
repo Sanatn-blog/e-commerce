@@ -471,7 +471,7 @@ export default function ProductsPageClient({
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setShowMobileFilters(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900"
                 >
                   <SlidersHorizontal className="w-5 h-5" />
                   <span>Filters</span>
@@ -536,7 +536,7 @@ export default function ProductsPageClient({
               <h2 className="text-xl font-bold text-gray-900">Filters</h2>
               <button
                 onClick={() => setShowMobileFilters(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-2 hover:bg-gray-100 rounded-lg text-gray-900"
               >
                 <X className="w-6 h-6" />
               </button>

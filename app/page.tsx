@@ -20,7 +20,7 @@ async function getProducts() {
     // Convert MongoDB documents to plain objects and serialize dates
     return products.map((product) => {
       const doc = product as unknown as MongoDocument & {
-        images?: Array<{ public_id: string; url: string }>;
+        images?: Array<{ public_id: string; url: string; _id?: unknown }>;
         createdAt: Date;
         updatedAt: Date;
       };
@@ -33,6 +33,7 @@ async function getProducts() {
             .map((img) => ({
               public_id: img.public_id,
               url: img.url,
+              // Explicitly exclude _id from subdocuments
             })) || [],
         createdAt: doc.createdAt.toISOString(),
         updatedAt: doc.updatedAt.toISOString(),
