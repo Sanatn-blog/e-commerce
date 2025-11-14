@@ -32,43 +32,46 @@ export default function Navbar() {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Mobile Menu Button */}
-          <button
-            onClick={toggleMobileMenu}
-            className="lg:hidden text-gray-700 hover:text-gray-900 p-2"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-
-          {/* Logo */}
-          <Link
-            href="/"
-            className="text-xl sm:text-2xl font-bold text-gray-900 whitespace-nowrap"
-          >
-            <span className="text-red-500">Fashion</span>Store
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-6">
-            <Link href="/men" className="text-gray-700 hover:text-gray-900">
-              Men
-            </Link>
-            <Link href="/women" className="text-gray-700 hover:text-gray-900">
-              Women
-            </Link>
-            <Link href="/kids" className="text-gray-700 hover:text-gray-900">
-              Kids
-            </Link>
-            <Link
-              href="/new-arrivals"
-              className="text-gray-700 hover:text-gray-900"
+          {/* Left Section: Mobile Menu Button + Logo + Navigation */}
+          <div className="flex items-center gap-8">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="lg:hidden text-gray-700 hover:text-gray-900 p-2"
+              aria-label="Toggle menu"
             >
-              New Arrivals
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            {/* Logo */}
+            <Link
+              href="/"
+              className="text-xl sm:text-2xl font-bold text-gray-900 whitespace-nowrap"
+            >
+              <span className="text-red-500">Fashion</span>Store
             </Link>
-            <Link href="/sale" className="text-gray-700 hover:text-gray-900">
-              Sale
-            </Link>
+
+            {/* Desktop Navigation Links */}
+            <div className="hidden lg:flex items-center gap-6">
+              <Link href="/men" className="text-gray-700 hover:text-gray-900">
+                Men
+              </Link>
+              <Link href="/women" className="text-gray-700 hover:text-gray-900">
+                Women
+              </Link>
+              <Link href="/kids" className="text-gray-700 hover:text-gray-900">
+                Kids
+              </Link>
+              <Link
+                href="/new-arrivals"
+                className="text-gray-700 hover:text-gray-900"
+              >
+                New Arrivals
+              </Link>
+              <Link href="/sale" className="text-gray-700 hover:text-gray-900">
+                Sale
+              </Link>
+            </div>
           </div>
 
           {/* Desktop Search Bar */}

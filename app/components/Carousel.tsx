@@ -81,15 +81,14 @@ export default function Carousel({ items }: CarouselProps) {
   }
 
   return (
-    <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden mt-16">
+    <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
       {/* Carousel Items */}
       <div className="relative h-full">
         {activeItems.map((item, index) => (
           <div
             key={item._id}
-            className={`absolute inset-0 transition-opacity duration-700 ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-700 ${index === currentIndex ? "opacity-100" : "opacity-0"
+              }`}
           >
             {item.link ? (
               <Link href={item.link} className="block h-full">
@@ -185,11 +184,10 @@ export default function Carousel({ items }: CarouselProps) {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`h-3 rounded-full transition-all shadow-lg ${
-                index === currentIndex
+              className={`h-3 rounded-full transition-all shadow-lg ${index === currentIndex
                   ? "bg-white w-8"
                   : "bg-white bg-opacity-70 hover:bg-opacity-100 w-3"
-              }`}
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
