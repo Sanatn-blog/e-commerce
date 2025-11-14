@@ -47,12 +47,18 @@ export default function HomePageClient({
   useEffect(() => {
     // Show modal after loading is complete and user is not logged in
     if (!loading && !customer) {
-      // Small delay to let the page render first
-      const timer = setTimeout(() => {
-        setShowAuthModal(true);
-      }, 1000);
+      // Check if modal has already been shown this session
+      const hasShownModal = sessionStorage.getItem("loginModalShown");
 
-      return () => clearTimeout(timer);
+      if (!hasShownModal) {
+        // Small delay to let the page render first
+        const timer = setTimeout(() => {
+          setShowAuthModal(true);
+          sessionStorage.setItem("loginModalShown", "true");
+        }, 1000);
+
+        return () => clearTimeout(timer);
+      }
     }
   }, [loading, customer]);
 

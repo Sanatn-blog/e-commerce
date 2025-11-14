@@ -83,31 +83,6 @@ export default function ProductCard({
               -{discount}%
             </div>
           )}
-          <button
-            onClick={handleToggleWishlist}
-            className={`absolute top-2 left-2 p-2 rounded-full shadow-md transition z-10 ${
-              inWishlist
-                ? "bg-rose-50 hover:bg-rose-100"
-                : "bg-white hover:bg-gray-100"
-            }`}
-            title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
-          >
-            <svg
-              className={`w-5 h-5 ${
-                inWishlist ? "text-rose-600" : "text-gray-600"
-              }`}
-              fill={inWishlist ? "currentColor" : "none"}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </button>
         </div>
         <div className="p-4">
           <p className="text-xs text-gray-500 uppercase mb-1">{category}</p>
@@ -140,10 +115,33 @@ export default function ProductCard({
           </div>
         </div>
       </Link>
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 flex gap-2">
+        <button
+          onClick={handleToggleWishlist}
+          className={`p-2.5 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center ${
+            inWishlist
+              ? "bg-rose-600 hover:bg-rose-700 text-white"
+              : "bg-gray-100 hover:bg-gray-200 text-rose-600"
+          }`}
+          title={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <svg
+            className="w-5 h-5"
+            fill={inWishlist ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+        </button>
         <Link
           href={`/product/${id}`}
-          className="w-full bg-rose-600 text-white py-2 rounded-lg font-medium transition-all duration-200 hover:bg-rose-700 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+          className="flex-1 bg-rose-600 text-white py-2 rounded-lg font-medium transition-all duration-200 hover:bg-rose-700 hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
         >
           <svg
             className="w-5 h-5"
