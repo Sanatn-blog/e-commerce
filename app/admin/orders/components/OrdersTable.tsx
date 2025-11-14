@@ -4,6 +4,18 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Eye, RefreshCw, X, Search, Filter } from "lucide-react";
 
+interface OrderItem {
+  productId: string;
+  name: string;
+  image: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  quantity: number;
+  size?: string;
+  color?: string;
+}
+
 interface Order {
   id: string;
   orderNumber: string;
@@ -15,9 +27,23 @@ interface Order {
   date: string;
   items: number;
   total: number;
+  subtotal: number;
+  shipping: number;
+  tax: number;
   status: string;
   paymentMethod: string;
   paymentStatus: string;
+  orderItems: OrderItem[];
+  shippingAddress: {
+    fullName: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2?: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
 }
 
 const statusColors: Record<string, string> = {
@@ -447,14 +473,110 @@ export default function OrdersTable() {
 
               <div className="border-t border-gray-200 pt-4">
                 <h4 className="font-semibold text-gray-900 mb-3">
+                  Shipping Address
+                </h4>
+                <div className="text-sm text-gray-900">
+                  <p className="font-medium">
+                    {selectedOrder.shippingAddress.fullName}
+                  </p>
+                  <p>{selectedOrder.shippingAddress.addressLine1}</p>
+                  {selectedOrder.shippingAddress.addressLine2 && (
+                    <p>{selectedOrder.shippingAddress.addressLine2}</p>
+                  )}
+                  <p>
+                    {selectedOrder.shippingAddress.city},{" "}
+                    {selectedOrder.shippingAddress.state}{" "}
+                    {selectedOrder.shippingAddress.zipCode}
+                  </p>
+                  <p>{selectedOrder.shippingAddress.country}</p>
+                  <p className="mt-1">
+                    Phone: {selectedOrder.shippingAddress.phone}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="font-semibold text-gray-900 mb-3">
+                  Order Items
+                </h4>
+                <div className="space-y-3">
+                  {selectedOrder.orderItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex gap-3 p-3 bg-gray-50 rounded-lg"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <h5 className="font-medium text-gray-900">
+                          {item.name}
+                        </h5>
+                        <div className="text-sm text-gray-600 mt-1 space-y-1">
+                          {item.size && <p>Size: {item.size}</p>}
+                          {item.color && <p>Color: {item.color}</p>}
+                          <p>Quantity: {item.quantity}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {item.originalPrice && item.discount ? (
+                          <div>
+                            <p className="text-sm text-gray-500 line-through">
+                              ${item.originalPrice.toFixed(2)}
+                            </p>
+                            <p className="font-semibold text-gray-900">
+                              ${item.price.toFixed(2)}
+                            </p>
+                            <p className="text-xs text-green-600 font-medium">
+                              {item.discount}% OFF
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="font-semibold text-gray-900">
+                            ${item.price.toFixed(2)}
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600 mt-1">
+                          Total: ${(item.price * item.quantity).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="font-semibold text-gray-900 mb-3">
                   Order Summary
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <p className="text-sm text-gray-500">Total Items</p>
-                    <p className="text-gray-900">{selectedOrder.items}</p>
+                    <p className="text-sm text-gray-500">Subtotal</p>
+                    <p className="text-gray-900">
+                      ${selectedOrder.subtotal.toFixed(2)}
+                    </p>
                   </div>
                   <div className="flex justify-between">
+                    <p className="text-sm text-gray-500">Shipping</p>
+                    <p className="text-gray-900">
+                      ${selectedOrder.shipping.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between">
+                    <p className="text-sm text-gray-500">Tax</p>
+                    <p className="text-gray-900">
+                      ${selectedOrder.tax.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-gray-200">
+                    <p className="font-semibold text-gray-900">Total Amount</p>
+                    <p className="font-semibold text-gray-900 text-lg">
+                      ${selectedOrder.total.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-gray-200">
                     <p className="text-sm text-gray-500">Payment Method</p>
                     <p className="text-gray-900 capitalize">
                       {selectedOrder.paymentMethod}
@@ -481,12 +603,6 @@ export default function OrdersTable() {
                     >
                       {selectedOrder.status}
                     </span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-gray-200">
-                    <p className="font-semibold text-gray-900">Total Amount</p>
-                    <p className="font-semibold text-gray-900 text-lg">
-                      ${selectedOrder.total.toFixed(2)}
-                    </p>
                   </div>
                 </div>
               </div>

@@ -265,7 +265,7 @@ export default function Footer() {
             <h3 className="text-white text-lg font-semibold mb-4">Connect</h3>
             <div className="flex space-x-6">
               <a
-                href="#"
+                href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors"
@@ -280,7 +280,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors"
@@ -295,7 +295,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
+                href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-white transition-colors"

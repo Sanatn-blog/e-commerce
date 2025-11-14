@@ -5,6 +5,8 @@ export interface IOrderItem {
   name: string;
   image: string;
   price: number;
+  originalPrice?: number;
+  discount?: number;
   quantity: number;
   size?: string;
   color?: string;
@@ -56,6 +58,8 @@ const OrderSchema: Schema = new Schema(
         name: { type: String, required: true },
         image: { type: String, required: true },
         price: { type: Number, required: true },
+        originalPrice: Number,
+        discount: Number,
         quantity: { type: Number, required: true },
         size: String,
         color: String,
