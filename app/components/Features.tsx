@@ -16,7 +16,7 @@ const features = [
       </svg>
     ),
     title: "Free Shipping",
-    description: "On orders over $50",
+    description: "On orders over ₹500",
   },
   {
     icon: (

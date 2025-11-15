@@ -104,7 +104,7 @@ export default function WishlistPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-2xl font-bold text-gray-900">
-                      ${item.price.toFixed(2)}
+                      ₹{item.price.toFixed(0)}
                     </p>
                   </div>
 

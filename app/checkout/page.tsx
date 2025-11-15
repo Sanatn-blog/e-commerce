@@ -59,7 +59,7 @@ export default function CheckoutPage() {
   });
 
   const subtotal = cartTotal;
-  const shipping = subtotal >= 500 ? 0 : 40.0;
+  const shipping = subtotal >= 500 ? 0 : 50;
   const tax = subtotal * 0.18; // 18% GST
   const total = subtotal + shipping + tax;
 
@@ -727,7 +727,7 @@ export default function CheckoutPage() {
                       {item.name} x {item.quantity}
                     </span>
                     <span className="text-gray-900 font-medium">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₹{(item.price * item.quantity).toFixed(0)}
                     </span>
                   </div>
                 ))}
@@ -736,22 +736,22 @@ export default function CheckoutPage() {
               <div className="border-t pt-4 space-y-3 mb-6">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed(0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span>
-                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? "FREE" : `₹${shipping.toFixed(0)}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>GST (18%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>₹{tax.toFixed(0)}</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>₹{total.toFixed(0)}</span>
                   </div>
                 </div>
               </div>

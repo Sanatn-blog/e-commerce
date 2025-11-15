@@ -343,7 +343,7 @@ export default function OrdersTable() {
                       {order.items}
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-900 font-medium">
-                      ${order.total.toFixed(2)}
+                      ₹{order.total.toFixed(0)}
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-600">
                       <div className="text-xs">
@@ -524,10 +524,10 @@ export default function OrdersTable() {
                         {item.originalPrice && item.discount ? (
                           <div>
                             <p className="text-sm text-gray-500 line-through">
-                              ${item.originalPrice.toFixed(2)}
+                              ₹{item.originalPrice.toFixed(0)}
                             </p>
                             <p className="font-semibold text-gray-900">
-                              ${item.price.toFixed(2)}
+                              ₹{item.price.toFixed(0)}
                             </p>
                             <p className="text-xs text-green-600 font-medium">
                               {item.discount}% OFF
@@ -535,11 +535,11 @@ export default function OrdersTable() {
                           </div>
                         ) : (
                           <p className="font-semibold text-gray-900">
-                            ${item.price.toFixed(2)}
+                            ₹{item.price.toFixed(0)}
                           </p>
                         )}
                         <p className="text-sm text-gray-600 mt-1">
-                          Total: ${(item.price * item.quantity).toFixed(2)}
+                          Total: ₹{(item.price * item.quantity).toFixed(0)}
                         </p>
                       </div>
                     </div>
@@ -555,25 +555,25 @@ export default function OrdersTable() {
                   <div className="flex justify-between">
                     <p className="text-sm text-gray-500">Subtotal</p>
                     <p className="text-gray-900">
-                      ${selectedOrder.subtotal.toFixed(2)}
+                      ₹{selectedOrder.subtotal.toFixed(0)}
                     </p>
                   </div>
                   <div className="flex justify-between">
                     <p className="text-sm text-gray-500">Shipping</p>
                     <p className="text-gray-900">
-                      ${selectedOrder.shipping.toFixed(2)}
+                      ₹{selectedOrder.shipping.toFixed(0)}
                     </p>
                   </div>
                   <div className="flex justify-between">
                     <p className="text-sm text-gray-500">Tax</p>
                     <p className="text-gray-900">
-                      ${selectedOrder.tax.toFixed(2)}
+                      ₹{selectedOrder.tax.toFixed(0)}
                     </p>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-gray-200">
                     <p className="font-semibold text-gray-900">Total Amount</p>
                     <p className="font-semibold text-gray-900 text-lg">
-                      ${selectedOrder.total.toFixed(2)}
+                      ₹{selectedOrder.total.toFixed(0)}
                     </p>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-gray-200">

@@ -29,166 +29,172 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Left Section: Mobile Menu Button + Logo + Navigation */}
-          <div className="flex items-center gap-8">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={toggleMobileMenu}
-              className="lg:hidden text-gray-700 hover:text-gray-900 p-2"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+    <>
+      {/* Backdrop Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeMobileMenu}
+          aria-hidden="true"
+        />
+      )}
 
-            {/* Logo */}
-            <Link
-              href="/"
-              className="text-xl sm:text-2xl font-bold text-gray-900 whitespace-nowrap"
-            >
-              <span className="text-red-500">Fashion</span>Store
-            </Link>
-
-            {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center gap-6">
-              <Link href="/men" className="text-gray-700 hover:text-gray-900">
-                Men
-              </Link>
-              <Link href="/women" className="text-gray-700 hover:text-gray-900">
-                Women
-              </Link>
-              <Link href="/kids" className="text-gray-700 hover:text-gray-900">
-                Kids
-              </Link>
-              <Link
-                href="/new-arrivals"
-                className="text-gray-700 hover:text-gray-900"
+      <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Left: Menu + Logo */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <button
+                onClick={toggleMobileMenu}
+                className="lg:hidden text-gray-700 hover:text-gray-900 p-1.5"
+                aria-label="Toggle menu"
               >
-                New Arrivals
+                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+
+              <Link
+                href="/"
+                className="text-lg sm:text-xl font-bold text-gray-900 whitespace-nowrap"
+              >
+                <span className="text-red-500">Fashion</span>Store
               </Link>
-              <Link href="/sale" className="text-gray-700 hover:text-gray-900">
-                Sale
-              </Link>
+
+              {/* Desktop Nav */}
+              <div className="hidden lg:flex items-center gap-4 ml-4">
+                <Link
+                  href="/men"
+                  className="text-sm text-gray-700 hover:text-red-600 transition"
+                >
+                  Men
+                </Link>
+                <Link
+                  href="/women"
+                  className="text-sm text-gray-700 hover:text-red-600 transition"
+                >
+                  Women
+                </Link>
+                <Link
+                  href="/kids"
+                  className="text-sm text-gray-700 hover:text-red-600 transition"
+                >
+                  Kids
+                </Link>
+                <Link
+                  href="/new-arrivals"
+                  className="text-sm text-gray-700 hover:text-red-600 transition"
+                >
+                  New
+                </Link>
+                <Link
+                  href="/sale"
+                  className="text-sm text-red-600 hover:text-red-700 font-semibold transition"
+                >
+                  Sale
+                </Link>
+              </div>
             </div>
-          </div>
 
-          {/* Desktop Search Bar */}
-          <div className="hidden md:block flex-1 max-w-md mx-4">
-            <SearchBar />
-          </div>
+            {/* Center: Desktop Search */}
+            <div className="hidden md:block flex-1 max-w-sm mx-4">
+              <SearchBar />
+            </div>
 
-          {/* Right Side Icons */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            {/* Mobile Search Button */}
-            <button
-              onClick={toggleMobileSearch}
-              className="md:hidden text-gray-700 hover:text-gray-900 p-2"
-              aria-label="Toggle search"
-            >
-              <Search size={20} />
-            </button>
+            {/* Right: Icons */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={toggleMobileSearch}
+                className="md:hidden text-gray-700 hover:text-gray-900 p-2"
+                aria-label="Search"
+              >
+                <Search size={20} />
+              </button>
 
-            {/* Wishlist */}
-            <Link
-              href="/wishlist"
-              className="flex flex-col items-center text-gray-700 hover:text-gray-900 relative"
-            >
-              <div className="relative">
-                <Heart size={20} className="sm:w-6 sm:h-6" />
+              <Link
+                href="/wishlist"
+                className="relative p-2 text-gray-700 hover:text-red-600 transition"
+                aria-label="Wishlist"
+              >
+                <Heart size={20} />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
                     {wishlistCount}
                   </span>
                 )}
-              </div>
-              <span className="hidden sm:block text-xs mt-1">Wishlist</span>
-            </Link>
+              </Link>
 
-            {/* Cart */}
-            <Link
-              href="/cart"
-              className="flex flex-col items-center text-gray-700 hover:text-gray-900 relative"
-            >
-              <div className="relative">
-                <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
+              <Link
+                href="/cart"
+                className="relative p-2 text-gray-700 hover:text-red-600 transition"
+                aria-label="Cart"
+              >
+                <ShoppingCart size={20} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center">
+                  <span className="absolute top-0.5 right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
+              </Link>
+
+              <div className="hidden sm:block ml-2">
+                <AuthButton />
               </div>
-              <span className="hidden sm:block text-xs mt-1">Cart</span>
-            </Link>
-
-            {/* Auth Button */}
-            <div className="hidden sm:block">
-              <AuthButton />
             </div>
           </div>
-        </div>
 
-        {/* Mobile Search Bar */}
-        {isMobileSearchOpen && (
-          <div className="md:hidden py-3 border-t border-gray-200">
-            <SearchBar />
-          </div>
-        )}
-
-        {/* Mobile Menu */}
-        <div
-          className={`lg:hidden border-t border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="py-4 space-y-1 bg-gradient-to-b from-white to-gray-50">
-            <Link
-              href="/men"
-              className="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:pl-6 transition-all duration-200 font-medium border-l-4 border-transparent hover:border-red-500"
-              onClick={closeMobileMenu}
-            >
-              Men
-            </Link>
-            <Link
-              href="/women"
-              className="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:pl-6 transition-all duration-200 font-medium border-l-4 border-transparent hover:border-red-500"
-              onClick={closeMobileMenu}
-            >
-              Women
-            </Link>
-            <Link
-              href="/kids"
-              className="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:pl-6 transition-all duration-200 font-medium border-l-4 border-transparent hover:border-red-500"
-              onClick={closeMobileMenu}
-            >
-              Kids
-            </Link>
-            <Link
-              href="/new-arrivals"
-              className="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:pl-6 transition-all duration-200 font-medium border-l-4 border-transparent hover:border-red-500"
-              onClick={closeMobileMenu}
-            >
-              New Arrivals
-            </Link>
-            <Link
-              href="/sale"
-              className="block px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 hover:pl-6 transition-all duration-200 font-medium border-l-4 border-transparent hover:border-red-500"
-              onClick={closeMobileMenu}
-            >
-              <span className="flex items-center gap-2">
-                Sale
-                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                  Hot
-                </span>
-              </span>
-            </Link>
-            <div className="sm:hidden px-4 py-3 border-t border-gray-200 mt-2 pt-4">
-              <AuthButton onNavigate={closeMobileMenu} />
+          {/* Mobile Search */}
+          {isMobileSearchOpen && (
+            <div className="md:hidden py-2 border-t">
+              <SearchBar />
             </div>
-          </div>
+          )}
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden border-t max-h-[calc(100vh-3.5rem)] overflow-y-auto bg-white relative z-50">
+              <div className="py-2 space-y-0.5">
+                <Link
+                  href="/men"
+                  className="block px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition font-medium"
+                  onClick={closeMobileMenu}
+                >
+                  Men
+                </Link>
+                <Link
+                  href="/women"
+                  className="block px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition font-medium"
+                  onClick={closeMobileMenu}
+                >
+                  Women
+                </Link>
+                <Link
+                  href="/kids"
+                  className="block px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition font-medium"
+                  onClick={closeMobileMenu}
+                >
+                  Kids
+                </Link>
+                <Link
+                  href="/new-arrivals"
+                  className="block px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition font-medium"
+                  onClick={closeMobileMenu}
+                >
+                  New Arrivals
+                </Link>
+                <Link
+                  href="/sale"
+                  className="block px-4 py-2.5 text-red-600 hover:bg-red-50 transition font-semibold"
+                  onClick={closeMobileMenu}
+                >
+                  Sale 🔥
+                </Link>
+                <div className="sm:hidden border-t pt-2 mt-2">
+                  <AuthButton onNavigate={closeMobileMenu} isMobile={true} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

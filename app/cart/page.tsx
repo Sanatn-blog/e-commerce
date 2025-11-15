@@ -33,10 +33,11 @@ export default function CartPage() {
   const [promoLoading, setPromoLoading] = useState(false);
   const [showSparkles, setShowSparkles] = useState(false);
 
+  // Prices are already in INR
   const subtotal = cartTotal;
   const discount = appliedPromo?.discountAmount || 0;
   const subtotalAfterDiscount = subtotal - discount;
-  const shipping = subtotal > 0 ? (subtotalAfterDiscount >= 500 ? 0 : 40.0) : 0;
+  const shipping = subtotal > 0 ? (subtotalAfterDiscount >= 500 ? 0 : 50) : 0; // Free shipping over ₹500
   const tax = subtotalAfterDiscount * 0.18; // 18% GST in India
   const total = subtotalAfterDiscount + shipping + tax;
 
@@ -126,10 +127,10 @@ export default function CartPage() {
                     }-${index}`}
                     className="bg-white rounded-lg shadow-sm p-6"
                   >
-                    <div className="flex space-x-4">
+                    <div className="flex flex-col sm:flex-row sm:space-x-4">
                       <Link
                         href={`/product/${item._id}`}
-                        className="relative w-24 h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                        className="relative w-full h-48 sm:w-24 sm:h-24 bg-gray-200 rounded-lg shrink-0 overflow-hidden hover:opacity-80 transition-opacity mb-3 sm:mb-0"
                       >
                         {item.image ? (
                           <Image
@@ -146,21 +147,21 @@ export default function CartPage() {
                       </Link>
 
                       <div className="flex-1">
-                        <div className="flex justify-between">
-                          <div>
+                        <div className="flex justify-between mb-2">
+                          <div className="flex-1">
                             <Link
                               href={`/product/${item._id}`}
                               className="hover:text-blue-600 transition-colors"
                             >
-                              <h3 className="font-semibold text-gray-900 mb-1">
+                              <h3 className="font-semibold text-gray-900 mb-1 text-base sm:text-lg line-clamp-2">
                                 {item.name}
                               </h3>
                             </Link>
-                            <p className="text-sm text-gray-500 capitalize">
+                            <p className="text-sm text-gray-500 capitalize mb-2">
                               {item.category}
                             </p>
                             {(item.size || item.color) && (
-                              <div className="flex gap-2 mt-1">
+                              <div className="flex flex-wrap gap-2 mb-3">
                                 {item.size && (
                                   <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
                                     Size: {item.size}
@@ -178,14 +179,58 @@ export default function CartPage() {
                             onClick={() =>
                               removeFromCart(item._id, item.size, item.color)
                             }
-                            className="text-gray-400 hover:text-red-500"
+                            className="text-gray-400 hover:text-red-500 h-fit"
                           >
-                            <Trash2 size={20} />
+                            <Trash2 size={18} className="sm:w-5 sm:h-5" />
                           </button>
                         </div>
 
-                        <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center space-x-3">
+                        {/* Mobile: Price on top, quantity controls below */}
+                        <div className="sm:hidden">
+                          <p className="text-xl font-bold text-gray-900 mb-3">
+                            ₹{(item.price * item.quantity).toFixed(0)}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center border border-gray-300 rounded-lg">
+                              <button
+                                onClick={() =>
+                                  updateQuantity(
+                                    item._id,
+                                    item.quantity - 1,
+                                    item.size,
+                                    item.color
+                                  )
+                                }
+                                className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 text-gray-700 rounded-l-lg"
+                              >
+                                <Minus size={18} />
+                              </button>
+                              <span className="w-12 text-center font-semibold text-gray-900 border-x border-gray-300">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  updateQuantity(
+                                    item._id,
+                                    item.quantity + 1,
+                                    item.size,
+                                    item.color
+                                  )
+                                }
+                                className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 text-gray-700 rounded-r-lg"
+                              >
+                                <Plus size={18} />
+                              </button>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              ₹{item.price.toFixed(0)} each
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Desktop: Original layout */}
+                        <div className="hidden sm:flex items-center justify-between gap-6">
+                          <div className="flex items-center border border-gray-300 rounded-lg">
                             <button
                               onClick={() =>
                                 updateQuantity(
@@ -195,11 +240,11 @@ export default function CartPage() {
                                   item.color
                                 )
                               }
-                              className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-gray-700"
+                              className="w-9 h-9 flex items-center justify-center hover:bg-gray-50 text-gray-700 rounded-l-lg"
                             >
                               <Minus size={16} />
                             </button>
-                            <span className="w-12 text-center font-medium text-gray-900">
+                            <span className="w-12 text-center font-medium text-gray-900 border-x border-gray-300">
                               {item.quantity}
                             </span>
                             <button
@@ -211,13 +256,13 @@ export default function CartPage() {
                                   item.color
                                 )
                               }
-                              className="w-8 h-8 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-gray-700"
+                              className="w-9 h-9 flex items-center justify-center hover:bg-gray-50 text-gray-700 rounded-r-lg"
                             >
                               <Plus size={16} />
                             </button>
                           </div>
-                          <p className="text-xl font-bold text-gray-900">
-                            ${(item.price * item.quantity).toFixed(2)}
+                          <p className="text-xl font-bold text-gray-900 ml-auto">
+                            ₹{(item.price * item.quantity).toFixed(0)}
                           </p>
                         </div>
                       </div>
@@ -266,9 +311,11 @@ export default function CartPage() {
                               <p className="text-sm text-green-600 font-medium">
                                 {appliedPromo.discountType === "percentage"
                                   ? `${appliedPromo.discountValue}% off`
-                                  : `$${appliedPromo.discountValue} off`}{" "}
-                                - You saved $
-                                {appliedPromo.discountAmount.toFixed(2)}! 🎉
+                                  : `₹${appliedPromo.discountValue.toFixed(
+                                      0
+                                    )} off`}{" "}
+                                - You saved ₹
+                                {appliedPromo.discountAmount.toFixed(0)}! 🎉
                               </p>
                             </div>
                           </div>
@@ -323,28 +370,28 @@ export default function CartPage() {
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-gray-600">
                       <span>Subtotal ({cart.length} items)</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>₹{subtotal.toFixed(0)}</span>
                     </div>
                     {appliedPromo && (
                       <div className="flex justify-between text-green-600 font-medium">
                         <span>Discount ({appliedPromo.code})</span>
-                        <span>-${discount.toFixed(2)}</span>
+                        <span>-₹{discount.toFixed(0)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-gray-600">
                       <span>Shipping</span>
                       <span>
-                        {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                        {shipping === 0 ? "FREE" : `₹${shipping.toFixed(0)}`}
                       </span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>GST (18%)</span>
-                      <span>${tax.toFixed(2)}</span>
+                      <span>₹{tax.toFixed(0)}</span>
                     </div>
                     <div className="border-t pt-4">
                       <div className="flex justify-between text-lg font-bold text-gray-900">
                         <span>Total</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>₹{total.toFixed(0)}</span>
                       </div>
                     </div>
                   </div>
@@ -410,7 +457,7 @@ export default function CartPage() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span>Free shipping over $500</span>
+                      <span>Free shipping over ₹500</span>
                     </div>
                   </div>
                 </div>

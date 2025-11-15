@@ -8,8 +8,10 @@ import { useState, useRef, useEffect } from "react";
 
 export default function AuthButton({
   onNavigate,
+  isMobile = false,
 }: {
   onNavigate?: () => void;
+  isMobile?: boolean;
 }) {
   const { customer, loading, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -38,6 +40,83 @@ export default function AuthButton({
   if (customer) {
     const profileImage = (customer as { image?: string }).image || null;
 
+    // Mobile version - show as dropdown
+    if (isMobile) {
+      return (
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="w-full flex items-center gap-3 px-4 py-2.5 bg-red-50 rounded-lg hover:bg-red-100 transition"
+          >
+            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center shrink-0">
+              {profileImage ? (
+                <Image
+                  src={profileImage}
+                  alt={customer.name || "Profile"}
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={20} className="text-gray-600" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {customer.name || "User"}
+              </p>
+              <p className="text-xs text-gray-600">{customer.phone}</p>
+            </div>
+            <ChevronDown
+              size={18}
+              className={`text-gray-600 transition-transform shrink-0 ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {isDropdownOpen && (
+            <div className="mt-1 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+              <Link
+                href="/account"
+                className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition font-medium"
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  onNavigate?.();
+                }}
+              >
+                <User size={18} />
+                <span className="text-sm">Profile</span>
+              </Link>
+              <Link
+                href="/orders"
+                className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition font-medium"
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  onNavigate?.();
+                }}
+              >
+                <Package size={18} />
+                <span className="text-sm">Orders</span>
+              </Link>
+              <button
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  onNavigate?.();
+                  logout();
+                }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition font-medium border-t border-gray-100"
+              >
+                <LogOut size={18} />
+                <span className="text-sm">Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Desktop version - show as dropdown
     return (
       <div className="relative" ref={dropdownRef}>
         <button
@@ -76,7 +155,10 @@ export default function AuthButton({
             <Link
               href="/account"
               className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-              onClick={() => setIsDropdownOpen(false)}
+              onClick={() => {
+                setIsDropdownOpen(false);
+                onNavigate?.();
+              }}
             >
               <User size={18} />
               <span className="text-sm font-medium">View Profile</span>
@@ -84,7 +166,10 @@ export default function AuthButton({
             <Link
               href="/orders"
               className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-              onClick={() => setIsDropdownOpen(false)}
+              onClick={() => {
+                setIsDropdownOpen(false);
+                onNavigate?.();
+              }}
             >
               <Package size={18} />
               <span className="text-sm font-medium">My Orders</span>

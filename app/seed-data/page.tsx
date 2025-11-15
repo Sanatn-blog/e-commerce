@@ -138,7 +138,7 @@ export default function SeedDataPage() {
                             ({product.category})
                           </span>
                           <span className="text-green-600 ml-2">
-                            ${product.price}
+                            ₹{product.price}
                           </span>
                         </li>
                       ))}

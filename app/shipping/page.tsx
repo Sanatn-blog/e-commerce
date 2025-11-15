@@ -26,7 +26,7 @@ export default function ShippingPage() {
                   Delivery in 5-7 business days
                 </p>
                 <p className="text-gray-600">
-                  Cost: $5.99 (Free on orders over $50)
+                  Cost: ₹50 (Free on orders over ₹500)
                 </p>
               </div>
               <div className="border-b pb-4">
@@ -36,14 +36,14 @@ export default function ShippingPage() {
                 <p className="text-gray-700 mb-2">
                   Delivery in 2-3 business days
                 </p>
-                <p className="text-gray-600">Cost: $12.99</p>
+                <p className="text-gray-600">Cost: ₹100</p>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   Overnight Shipping
                 </h3>
                 <p className="text-gray-700 mb-2">Next business day delivery</p>
-                <p className="text-gray-600">Cost: $24.99</p>
+                <p className="text-gray-600">Cost: ₹200</p>
               </div>
             </div>
           </div>

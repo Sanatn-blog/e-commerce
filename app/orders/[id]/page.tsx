@@ -344,10 +344,10 @@ export default function OrderDetailsPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-gray-900">
-                          ${item.price.toFixed(2)}
+                          ₹{item.price.toFixed(0)}
                         </p>
                         <p className="text-sm text-gray-500">
-                          ${(item.price * item.quantity).toFixed(2)} total
+                          ₹{(item.price * item.quantity).toFixed(0)} total
                         </p>
                       </div>
                     </div>
@@ -389,9 +389,9 @@ export default function OrderDetailsPage() {
                             <div className="text-sm">Color: {item.color}</div>
                           )}
                         </td>
-                        <td>${item.price.toFixed(2)}</td>
+                        <td>₹{item.price.toFixed(0)}</td>
                         <td>{item.quantity}</td>
-                        <td>${(item.price * item.quantity).toFixed(2)}</td>
+                        <td>₹{(item.price * item.quantity).toFixed(0)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -499,23 +499,23 @@ export default function OrderDetailsPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-gray-700">
                     <span>Subtotal</span>
-                    <span>${order.subtotal.toFixed(2)}</span>
+                    <span>₹{order.subtotal.toFixed(0)}</span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Shipping</span>
                     <span>
                       {order.shipping === 0
                         ? "FREE"
-                        : `$${order.shipping.toFixed(2)}`}
+                        : `₹${order.shipping.toFixed(0)}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-700">
                     <span>Tax</span>
-                    <span>${order.tax.toFixed(2)}</span>
+                    <span>₹{order.tax.toFixed(0)}</span>
                   </div>
                   <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-900 print-total">
                     <span>Total</span>
-                    <span>${order.total.toFixed(2)}</span>
+                    <span>₹{order.total.toFixed(0)}</span>
                   </div>
                 </div>
 

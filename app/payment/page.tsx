@@ -262,7 +262,7 @@ export default function PaymentPage() {
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-600 mb-1">Order Total</p>
-              <p className="text-3xl font-bold text-gray-900">${orderTotal}</p>
+              <p className="text-3xl font-bold text-gray-900">₹{orderTotal}</p>
             </div>
             <Link
               href="/account?section=orders"
@@ -418,7 +418,7 @@ export default function PaymentPage() {
                       {item.name} x {item.quantity}
                     </span>
                     <span className="text-gray-900 font-medium">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₹{(item.price * item.quantity).toFixed(0)}
                     </span>
                   </div>
                 ))}
@@ -427,7 +427,7 @@ export default function PaymentPage() {
               <div className="border-t pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold text-gray-900">
                   <span>Total</span>
-                  <span>${orderTotal}</span>
+                  <span>₹{orderTotal}</span>
                 </div>
               </div>
 

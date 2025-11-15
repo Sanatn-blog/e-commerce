@@ -19,7 +19,7 @@ export default function FAQPage() {
         },
         {
           q: "Do you offer gift wrapping?",
-          a: "Yes! We offer gift wrapping services for an additional $5 per item. You can select this option during checkout.",
+          a: "Yes! We offer gift wrapping services for an additional ₹50 per item. You can select this option during checkout.",
         },
         {
           q: "How do I use a promo code?",

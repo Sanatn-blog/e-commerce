@@ -551,7 +551,7 @@ export default function AccountPage() {
                                 </p>
                               </div>
                               <p className="font-semibold text-gray-900">
-                                ${item.price.toFixed(2)}
+                                ₹{item.price.toFixed(0)}
                               </p>
                             </div>
                           ))}
@@ -565,7 +565,7 @@ export default function AccountPage() {
                         <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
                           <span className="text-gray-600">Total</span>
                           <span className="text-lg font-bold text-gray-900">
-                            ${order.total.toFixed(2)}
+                            ₹{order.total.toFixed(0)}
                           </span>
                         </div>
                       </Link>
@@ -720,7 +720,7 @@ export default function AccountPage() {
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-lg font-bold text-gray-900">
-                              ${item.price.toFixed(2)}
+                              ₹{item.price.toFixed(0)}
                             </span>
                             <button
                               onClick={() => {

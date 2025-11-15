@@ -317,13 +317,13 @@ export default function ProductDetailClient({
             {/* Price */}
             <div className="flex items-baseline gap-3 mb-6">
               <span className="text-4xl font-bold text-gray-900">
-                ${product.price}
+                ₹{product.price}
               </span>
               {product.originalPrice &&
                 product.originalPrice > product.price && (
                   <>
                     <span className="text-2xl text-gray-500 line-through">
-                      ${product.originalPrice}
+                      ₹{product.originalPrice}
                     </span>
                     {product.discount && (
                       <span className="text-lg font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full">
@@ -511,7 +511,7 @@ export default function ProductDetailClient({
                   d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
                 />
               </svg>
-              <span>Free shipping on orders over $500</span>
+              <span>Free shipping on orders over ₹500</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
               <svg

@@ -133,7 +133,7 @@ export default function PromoCodesTable() {
                   <div className="text-sm text-gray-900">
                     {promo.discountType === "percentage"
                       ? `${promo.discountValue}%`
-                      : `$${promo.discountValue}`}
+                      : `₹${promo.discountValue}`}
                   </div>
                   {promo.maxDiscountAmount && (
                     <div className="text-xs text-gray-500">

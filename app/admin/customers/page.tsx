@@ -483,7 +483,7 @@ export default function CustomersPage() {
                                 Total Spent
                               </p>
                               <p className="text-2xl font-bold text-green-600">
-                                ${customerDetails.stats.totalSpent.toFixed(2)}
+                                ₹{customerDetails.stats.totalSpent.toFixed(0)}
                               </p>
                             </div>
                             <div className="bg-purple-50 p-4 rounded-lg">
@@ -527,7 +527,7 @@ export default function CustomersPage() {
                                     </div>
                                     <div className="text-right">
                                       <p className="font-semibold text-gray-900">
-                                        ${order.total.toFixed(2)}
+                                        ₹{order.total.toFixed(0)}
                                       </p>
                                       <span
                                         className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${

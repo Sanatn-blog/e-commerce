@@ -78,11 +78,6 @@ export default function ProductCard({
               </svg>
             </div>
           )}
-          {discount > 0 && (
-            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-semibold z-10">
-              -{discount}%
-            </div>
-          )}
         </div>
         <div className="p-4">
           <p className="text-xs text-gray-500 uppercase mb-1">{category}</p>
@@ -105,12 +100,19 @@ export default function ProductCard({
             </div>
             <span className="text-xs text-gray-500 ml-2">({reviews})</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-gray-900">${price}</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xl font-bold text-gray-900">₹{price}</span>
             {originalPrice && (
-              <span className="text-sm text-gray-500 line-through">
-                ${originalPrice}
-              </span>
+              <>
+                <span className="text-sm text-gray-500 line-through">
+                  ₹{originalPrice}
+                </span>
+                {discount > 0 && (
+                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-xs font-semibold">
+                    {discount}% OFF
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>
