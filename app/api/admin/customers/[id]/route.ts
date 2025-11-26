@@ -34,19 +34,29 @@ export async function GET(
     }
 
     // Fetch customer orders
-    const orders = await Order.find({ customer: customerId })
+    const ordersData = await Order.find({ customerId: customerId })
       .select("orderNumber total status createdAt items")
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
 
+    // Transform orders to include items count
+    const orders = ordersData.map((order) => ({
+      _id: order._id,
+      orderNumber: order.orderNumber,
+      total: order.total,
+      status: order.status,
+      createdAt: order.createdAt,
+      items: Array.isArray(order.items) ? order.items.length : 0,
+    }));
+
     // Fetch customer addresses
-    const addresses = await Address.find({ customer: customerId })
+    const addresses = await Address.find({ customerId: customerId })
       .sort({ isDefault: -1, createdAt: -1 })
       .lean();
 
     // Calculate statistics
-    const allOrders = await Order.find({ customer: customerId }).lean();
+    const allOrders = await Order.find({ customerId: customerId }).lean();
     const totalOrders = allOrders.length;
     const totalSpent = allOrders.reduce(
       (sum, order) => sum + (order.total || 0),

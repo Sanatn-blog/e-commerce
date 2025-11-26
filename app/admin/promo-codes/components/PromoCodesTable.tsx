@@ -137,12 +137,12 @@ export default function PromoCodesTable() {
                   </div>
                   {promo.maxDiscountAmount && (
                     <div className="text-xs text-gray-500">
-                      Max: ${promo.maxDiscountAmount}
+                      Max: ₹{promo.maxDiscountAmount}
                     </div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${promo.minPurchaseAmount}
+                  ₹{promo.minPurchaseAmount}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {promo.usedCount}

@@ -65,62 +65,64 @@ export default function RecentOrders() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
         <Link
           href="/admin/orders"
-          className="text-sm text-blue-600 hover:text-blue-700"
+          className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
         >
           View All
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
         </Link>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                Order Number
-              </th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                Customer
-              </th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                Amount
-              </th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr
-                key={order.id}
-                className="border-b border-gray-100 hover:bg-gray-50"
+      <div className="space-y-3">
+        {orders.map((order) => (
+          <div
+            key={order.id}
+            className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all cursor-pointer"
+          >
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+                  {order.orderNumber.slice(-4)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm">
+                    {order.orderNumber}
+                  </p>
+                  <p className="text-xs text-gray-500">{order.customer.name}</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="font-bold text-gray-900">
+                  ₹{order.total.toLocaleString("en-IN")}
+                </p>
+              </div>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+                  statusColors[order.status]
+                }`}
               >
-                <td className="py-3 px-4 text-sm text-gray-900">
-                  {order.orderNumber}
-                </td>
-                <td className="py-3 px-4 text-sm text-gray-900">
-                  {order.customer.name}
-                </td>
-                <td className="py-3 px-4 text-sm text-gray-900">
-                  ₹{order.total.toFixed(0)}
-                </td>
-                <td className="py-3 px-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
-                      statusColors[order.status]
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                {order.status}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
