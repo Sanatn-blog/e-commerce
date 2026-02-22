@@ -33,7 +33,7 @@ async function createAdmin() {
     const MONGODB_URL = process.env.MONGODB_URL;
 
     if (!MONGODB_URL) {
-      console.error("❌ MONGODB_URL not found in .env file");
+      console.error(" MONGODB_URL not found in .env file");
       process.exit(1);
     }
 
@@ -75,7 +75,7 @@ async function createAdmin() {
     await mongoose.connection.close();
     console.log("\n✅ Done!");
   } catch (error) {
-    console.error("❌ Error:", error.message);
+    console.error(" Error:", error.message);
     if (mongoose.connection.readyState === 1) {
       await mongoose.connection.close();
     }

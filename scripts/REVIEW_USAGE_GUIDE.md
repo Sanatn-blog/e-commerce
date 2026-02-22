@@ -35,7 +35,7 @@
 - You have purchased the product
 - You haven't reviewed this product before
 
-❌ **You CANNOT review if:**
+ **You CANNOT review if:**
 
 - You are not logged in
 - You haven't purchased the product

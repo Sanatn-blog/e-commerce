@@ -224,7 +224,7 @@ Category Dropdown:
 - Delete subcategories anytime
 - Delete main categories that have NO subcategories
 
-### ❌ What You CANNOT Do:
+###  What You CANNOT Do:
 
 - Delete a main category that has subcategories
   - Error: "Cannot delete category with subcategories"
