@@ -65,13 +65,12 @@ export default function AuthButton({
               <p className="text-sm font-semibold text-gray-900 truncate">
                 {customer.name || "User"}
               </p>
-              <p className="text-xs text-gray-600">{customer.phone}</p>
+              <p className="text-xs text-gray-600">{customer.email}</p>
             </div>
             <ChevronDown
               size={18}
-              className={`text-gray-600 transition-transform shrink-0 ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`text-gray-600 transition-transform shrink-0 ${isDropdownOpen ? "rotate-180" : ""
+                }`}
             />
           </button>
 
@@ -138,9 +137,8 @@ export default function AuthButton({
           </div>
           <ChevronDown
             size={16}
-            className={`transition-transform ${
-              isDropdownOpen ? "rotate-180" : ""
-            }`}
+            className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""
+              }`}
           />
         </button>
 
@@ -150,7 +148,7 @@ export default function AuthButton({
               <p className="text-sm font-semibold text-gray-900">
                 {customer.name || "User"}
               </p>
-              <p className="text-xs text-gray-500">{customer.phone}</p>
+              <p className="text-xs text-gray-500">{customer.email}</p>
             </div>
             <Link
               href="/account"

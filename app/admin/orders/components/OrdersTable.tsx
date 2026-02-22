@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Eye, RefreshCw, X, Search, Filter } from "lucide-react";
+import CustomAlert from "../../components/CustomAlert";
+import { useCustomAlert } from "../../hooks/useCustomAlert";
 
 interface OrderItem {
   productId: string;
@@ -59,6 +61,7 @@ export default function OrdersTable() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { isOpen, config, showAlert, closeAlert, handleConfirm } = useCustomAlert();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -126,7 +129,11 @@ export default function OrdersTable() {
       // Refresh orders
       fetchOrders();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to update order");
+      showAlert({
+        title: "Error",
+        message: err instanceof Error ? err.message : "Failed to update order",
+        type: "error",
+      });
     }
   };
 
@@ -207,418 +214,426 @@ export default function OrdersTable() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            All Orders ({filteredOrders.length} of {orders.length})
-          </h2>
-          <button
-            onClick={fetchOrders}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-[200px] relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by order, customer, phone, email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="text-gray-900 w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    <>
+      <CustomAlert
+        isOpen={isOpen}
+        onClose={closeAlert}
+        onConfirm={handleConfirm}
+        title={config.title}
+        message={config.message}
+        type={config.type}
+        confirmText={config.confirmText}
+        cancelText={config.cancelText}
+      />
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">
+              All Orders ({filteredOrders.length} of {orders.length})
+            </h2>
+            <button
+              onClick={fetchOrders}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-gray-900 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[200px] relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by order, customer, phone, email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="text-gray-900 w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-          <select
-            value={paymentFilter}
-            onChange={(e) => setPaymentFilter(e.target.value)}
-            className="text-gray-900 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Payments</option>
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
-          </select>
-
-          {(searchQuery ||
-            statusFilter !== "all" ||
-            paymentFilter !== "all") && (
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setStatusFilter("all");
-                setPaymentFilter("all");
-              }}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="text-gray-900 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Clear Filters
-            </button>
-          )}
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              className="text-gray-900 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Payments</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+            </select>
+
+            {(searchQuery ||
+              statusFilter !== "all" ||
+              paymentFilter !== "all") && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("all");
+                    setPaymentFilter("all");
+                  }}
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+                >
+                  Clear Filters
+                </button>
+              )}
+          </div>
         </div>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Order Number
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Customer
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Time
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Items
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Amount
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Payment
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Status
-              </th>
-              <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedDates.map((date) => (
-              <>
-                <tr key={date} className="bg-gray-100">
-                  <td
-                    colSpan={8}
-                    className="py-3 px-6 text-sm font-semibold text-gray-700"
-                  >
-                    {date} ({groupedOrders[date].length}{" "}
-                    {groupedOrders[date].length === 1 ? "order" : "orders"})
-                  </td>
-                </tr>
-                {groupedOrders[date].map((order) => (
-                  <tr
-                    key={order.id}
-                    data-order-id={order.id}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="py-4 px-6 text-sm font-medium text-gray-900">
-                      {order.orderNumber}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Order Number
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Customer
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Time
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Items
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Amount
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Payment
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Status
+                </th>
+                <th className="text-left py-3 px-6 text-sm font-semibold text-gray-700">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedDates.map((date) => (
+                <>
+                  <tr key={date} className="bg-gray-100">
+                    <td
+                      colSpan={8}
+                      className="py-3 px-6 text-sm font-semibold text-gray-700"
+                    >
+                      {date} ({groupedOrders[date].length}{" "}
+                      {groupedOrders[date].length === 1 ? "order" : "orders"})
                     </td>
-                    <td className="py-4 px-6 text-sm text-gray-900">
-                      <div>
-                        <div className="font-medium">{order.customer.name}</div>
-                        <div className="text-xs text-gray-500">
-                          {order.customer.phone}
+                  </tr>
+                  {groupedOrders[date].map((order) => (
+                    <tr
+                      key={order.id}
+                      data-order-id={order.id}
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="py-4 px-6 text-sm font-medium text-gray-900">
+                        {order.orderNumber}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-900">
+                        <div>
+                          <div className="font-medium">{order.customer.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {order.customer.phone}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 text-sm text-gray-600">
-                      {new Date(order.date).toLocaleTimeString("en-IN", {
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-600">
+                        {new Date(order.date).toLocaleTimeString("en-IN", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-600">
+                        {order.items}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-900 font-medium">
+                        ₹{order.total.toFixed(0)}
+                      </td>
+                      <td className="py-4 px-6 text-sm text-gray-600">
+                        <div className="text-xs">
+                          <div className="capitalize">{order.paymentMethod}</div>
+                          <div
+                            className={`${order.paymentStatus === "paid"
+                              ? "text-green-600"
+                              : "text-yellow-600"
+                              }`}
+                          >
+                            {order.paymentStatus}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <select
+                          value={order.status}
+                          onChange={(e) =>
+                            handleStatusChange(order.id, e.target.value)
+                          }
+                          className={`px-2 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${statusColors[order.status]
+                            }`}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="processing">Processing</option>
+                          <option value="shipped">Shipped</option>
+                          <option value="delivered">Delivered</option>
+                          <option value="cancelled">Cancelled</option>
+                        </select>
+                      </td>
+                      <td className="py-4 px-6">
+                        <button
+                          onClick={() => setSelectedOrder(order)}
+                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          title="View order details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {filteredOrders.length === 0 && (
+          <div className="p-12 text-center">
+            <Filter className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-600 text-lg">No orders match your filters</p>
+            <p className="text-gray-500 text-sm mt-2">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        )}
+
+        {selectedOrder && (
+          <div className="fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Order Details
+                </h3>
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Order Number</p>
+                    <p className="font-semibold text-gray-900">
+                      {selectedOrder.orderNumber}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Order Date & Time</p>
+                    <p className="font-semibold text-gray-900">
+                      {new Date(selectedOrder.date).toLocaleDateString("en-IN", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {new Date(selectedOrder.date).toLocaleTimeString("en-IN", {
                         hour: "2-digit",
                         minute: "2-digit",
                         hour12: true,
                       })}
-                    </td>
-                    <td className="py-4 px-6 text-sm text-gray-600">
-                      {order.items}
-                    </td>
-                    <td className="py-4 px-6 text-sm text-gray-900 font-medium">
-                      ₹{order.total.toFixed(0)}
-                    </td>
-                    <td className="py-4 px-6 text-sm text-gray-600">
-                      <div className="text-xs">
-                        <div className="capitalize">{order.paymentMethod}</div>
-                        <div
-                          className={`${
-                            order.paymentStatus === "paid"
-                              ? "text-green-600"
-                              : "text-yellow-600"
-                          }`}
-                        >
-                          {order.paymentStatus}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <select
-                        value={order.status}
-                        onChange={(e) =>
-                          handleStatusChange(order.id, e.target.value)
-                        }
-                        className={`px-2 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${
-                          statusColors[order.status]
-                        }`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">
+                    Customer Information
+                  </h4>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm text-gray-500">Name</p>
+                      <p className="text-gray-900">
+                        {selectedOrder.customer.name}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="text-gray-900">
+                        {selectedOrder.customer.email}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="text-gray-900">
+                        {selectedOrder.customer.phone}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">
+                    Shipping Address
+                  </h4>
+                  <div className="text-sm text-gray-900">
+                    <p className="font-medium">
+                      {selectedOrder.shippingAddress.fullName}
+                    </p>
+                    <p>{selectedOrder.shippingAddress.addressLine1}</p>
+                    {selectedOrder.shippingAddress.addressLine2 && (
+                      <p>{selectedOrder.shippingAddress.addressLine2}</p>
+                    )}
+                    <p>
+                      {selectedOrder.shippingAddress.city},{" "}
+                      {selectedOrder.shippingAddress.state}{" "}
+                      {selectedOrder.shippingAddress.zipCode}
+                    </p>
+                    <p>{selectedOrder.shippingAddress.country}</p>
+                    <p className="mt-1">
+                      Phone: {selectedOrder.shippingAddress.phone}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">
+                    Order Items
+                  </h4>
+                  <div className="space-y-3">
+                    {selectedOrder.orderItems.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex gap-3 p-3 bg-gray-50 rounded-lg"
                       >
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
-                    </td>
-                    <td className="py-4 px-6">
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
-                        title="View order details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {filteredOrders.length === 0 && (
-        <div className="p-12 text-center">
-          <Filter className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-600 text-lg">No orders match your filters</p>
-          <p className="text-gray-500 text-sm mt-2">
-            Try adjusting your search or filter criteria
-          </p>
-        </div>
-      )}
-
-      {selectedOrder && (
-        <div className="fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">
-                Order Details
-              </h3>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Order Number</p>
-                  <p className="font-semibold text-gray-900">
-                    {selectedOrder.orderNumber}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Order Date & Time</p>
-                  <p className="font-semibold text-gray-900">
-                    {new Date(selectedOrder.date).toLocaleDateString("en-IN", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {new Date(selectedOrder.date).toLocaleTimeString("en-IN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4">
-                <h4 className="font-semibold text-gray-900 mb-3">
-                  Customer Information
-                </h4>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-sm text-gray-500">Name</p>
-                    <p className="text-gray-900">
-                      {selectedOrder.customer.name}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-gray-900">
-                      {selectedOrder.customer.email}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p className="text-gray-900">
-                      {selectedOrder.customer.phone}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4">
-                <h4 className="font-semibold text-gray-900 mb-3">
-                  Shipping Address
-                </h4>
-                <div className="text-sm text-gray-900">
-                  <p className="font-medium">
-                    {selectedOrder.shippingAddress.fullName}
-                  </p>
-                  <p>{selectedOrder.shippingAddress.addressLine1}</p>
-                  {selectedOrder.shippingAddress.addressLine2 && (
-                    <p>{selectedOrder.shippingAddress.addressLine2}</p>
-                  )}
-                  <p>
-                    {selectedOrder.shippingAddress.city},{" "}
-                    {selectedOrder.shippingAddress.state}{" "}
-                    {selectedOrder.shippingAddress.zipCode}
-                  </p>
-                  <p>{selectedOrder.shippingAddress.country}</p>
-                  <p className="mt-1">
-                    Phone: {selectedOrder.shippingAddress.phone}
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4">
-                <h4 className="font-semibold text-gray-900 mb-3">
-                  Order Items
-                </h4>
-                <div className="space-y-3">
-                  {selectedOrder.orderItems.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex gap-3 p-3 bg-gray-50 rounded-lg"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <h5 className="font-medium text-gray-900">
-                          {item.name}
-                        </h5>
-                        <div className="text-sm text-gray-600 mt-1 space-y-1">
-                          {item.size && <p>Size: {item.size}</p>}
-                          {item.color && <p>Color: {item.color}</p>}
-                          <p>Quantity: {item.quantity}</p>
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <h5 className="font-medium text-gray-900">
+                            {item.name}
+                          </h5>
+                          <div className="text-sm text-gray-600 mt-1 space-y-1">
+                            {item.size && <p>Size: {item.size}</p>}
+                            {item.color && <p>Color: {item.color}</p>}
+                            <p>Quantity: {item.quantity}</p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        {item.originalPrice && item.discount ? (
-                          <div>
-                            <p className="text-sm text-gray-500 line-through">
-                              ₹{item.originalPrice.toFixed(0)}
-                            </p>
+                        <div className="text-right">
+                          {item.originalPrice && item.discount ? (
+                            <div>
+                              <p className="text-sm text-gray-500 line-through">
+                                ₹{item.originalPrice.toFixed(0)}
+                              </p>
+                              <p className="font-semibold text-gray-900">
+                                ₹{item.price.toFixed(0)}
+                              </p>
+                              <p className="text-xs text-green-600 font-medium">
+                                {item.discount}% OFF
+                              </p>
+                            </div>
+                          ) : (
                             <p className="font-semibold text-gray-900">
                               ₹{item.price.toFixed(0)}
                             </p>
-                            <p className="text-xs text-green-600 font-medium">
-                              {item.discount}% OFF
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="font-semibold text-gray-900">
-                            ₹{item.price.toFixed(0)}
+                          )}
+                          <p className="text-sm text-gray-600 mt-1">
+                            Total: ₹{(item.price * item.quantity).toFixed(0)}
                           </p>
-                        )}
-                        <p className="text-sm text-gray-600 mt-1">
-                          Total: ₹{(item.price * item.quantity).toFixed(0)}
-                        </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <h4 className="font-semibold text-gray-900 mb-3">
-                  Order Summary
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <p className="text-sm text-gray-500">Subtotal</p>
-                    <p className="text-gray-900">
-                      ₹{selectedOrder.subtotal.toFixed(0)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between">
-                    <p className="text-sm text-gray-500">Shipping</p>
-                    <p className="text-gray-900">
-                      ₹{selectedOrder.shipping.toFixed(0)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between">
-                    <p className="text-sm text-gray-500">Tax</p>
-                    <p className="text-gray-900">
-                      ₹{selectedOrder.tax.toFixed(0)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-gray-200">
-                    <p className="font-semibold text-gray-900">Total Amount</p>
-                    <p className="font-semibold text-gray-900 text-lg">
-                      ₹{selectedOrder.total.toFixed(0)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-gray-200">
-                    <p className="text-sm text-gray-500">Payment Method</p>
-                    <p className="text-gray-900 capitalize">
-                      {selectedOrder.paymentMethod}
-                    </p>
-                  </div>
-                  <div className="flex justify-between">
-                    <p className="text-sm text-gray-500">Payment Status</p>
-                    <p
-                      className={`capitalize ${
-                        selectedOrder.paymentStatus === "paid"
+                <div className="border-t border-gray-200 pt-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">
+                    Order Summary
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-500">Subtotal</p>
+                      <p className="text-gray-900">
+                        ₹{selectedOrder.subtotal.toFixed(0)}
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-500">Shipping</p>
+                      <p className="text-gray-900">
+                        ₹{selectedOrder.shipping.toFixed(0)}
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-500">Tax</p>
+                      <p className="text-gray-900">
+                        ₹{selectedOrder.tax.toFixed(0)}
+                      </p>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-200">
+                      <p className="font-semibold text-gray-900">Total Amount</p>
+                      <p className="font-semibold text-gray-900 text-lg">
+                        ₹{selectedOrder.total.toFixed(0)}
+                      </p>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-200">
+                      <p className="text-sm text-gray-500">Payment Method</p>
+                      <p className="text-gray-900 capitalize">
+                        {selectedOrder.paymentMethod}
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-500">Payment Status</p>
+                      <p
+                        className={`capitalize ${selectedOrder.paymentStatus === "paid"
                           ? "text-green-600 font-medium"
                           : "text-yellow-600 font-medium"
-                      }`}
-                    >
-                      {selectedOrder.paymentStatus}
-                    </p>
-                  </div>
-                  <div className="flex justify-between">
-                    <p className="text-sm text-gray-500">Order Status</p>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        statusColors[selectedOrder.status]
-                      }`}
-                    >
-                      {selectedOrder.status}
-                    </span>
+                          }`}
+                      >
+                        {selectedOrder.paymentStatus}
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-500">Order Status</p>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[selectedOrder.status]
+                          }`}
+                      >
+                        {selectedOrder.status}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-4 flex justify-end">
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Close
-              </button>
+              <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 p-4 flex justify-end">
+                <button
+                  onClick={() => setSelectedOrder(null)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email, address, address2, city, state, zipCode, landmark } =
+    const { name, phone, address, address2, city, state, zipCode, landmark } =
       await request.json();
 
     await connectDB();
@@ -26,7 +26,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Update customer profile
-    if (email) customer.email = email;
+    if (name) customer.name = name;
+    if (phone) customer.phone = phone;
     if (address) customer.address = address;
     if (address2 !== undefined) customer.address2 = address2;
     if (city) customer.city = city;
@@ -40,9 +41,9 @@ export async function POST(request: NextRequest) {
       message: "Profile updated successfully",
       customer: {
         id: customer._id,
-        phone: customer.phone,
-        name: customer.name,
         email: customer.email,
+        name: customer.name,
+        phone: customer.phone,
       },
     });
   } catch (error) {

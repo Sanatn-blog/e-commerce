@@ -26,7 +26,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email, phone, name }),
       });
 
       const data = await res.json();
@@ -64,7 +64,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp, name }),
+        body: JSON.stringify({ email, otp, name, phone }),
       });
 
       const data = await res.json();
@@ -99,7 +99,7 @@ export default function RegisterPage() {
           <p className="text-gray-600">
             {step === "phone"
               ? "Sign up to get started"
-              : "Enter the OTP sent to your phone"}
+              : "Enter the OTP sent to your email"}
           </p>
         </div>
 
@@ -158,7 +158,7 @@ export default function RegisterPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email (Optional)
+                Email
               </label>
               <input
                 id="email"
@@ -167,6 +167,7 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@example.com"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition text-gray-900"
+                required
               />
             </div>
 
@@ -200,7 +201,7 @@ export default function RegisterPage() {
                 required
               />
               <p className="mt-2 text-xs text-gray-500 text-center">
-                OTP sent to {phone}
+                OTP sent to {email}
               </p>
             </div>
 

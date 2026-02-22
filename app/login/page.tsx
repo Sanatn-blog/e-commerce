@@ -8,8 +8,8 @@ import { useAuth } from "../context/AuthContext";
 export default function LoginPage() {
   const router = useRouter();
   const { refreshCustomer } = useAuth();
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState("");
+  const [step, setStep] = useState<"email" | "otp">("email");
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,7 +24,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await res.json();
@@ -62,7 +62,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp }),
+        body: JSON.stringify({ email, otp }),
       });
 
       const data = await res.json();
@@ -84,7 +84,7 @@ export default function LoginPage() {
 
   const handleResendOTP = () => {
     setOtp("");
-    setStep("phone");
+    setStep("email");
   };
 
   return (
@@ -95,9 +95,9 @@ export default function LoginPage() {
             Welcome Back
           </h1>
           <p className="text-gray-600">
-            {step === "phone"
-              ? "Enter your phone number to continue"
-              : "Enter the OTP sent to your phone"}
+            {step === "email"
+              ? "Enter your email address to continue"
+              : "Enter the OTP sent to your email"}
           </p>
         </div>
 
@@ -107,29 +107,26 @@ export default function LoginPage() {
           </div>
         )}
 
-        {step === "phone" ? (
+        {step === "email" ? (
           <form onSubmit={handleSendOTP} className="space-y-6">
             <div>
               <label
-                htmlFor="phone"
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Phone Number
+                Email Address
               </label>
               <input
-                id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) =>
-                  setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-                }
-                placeholder="9876543210"
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value.toLowerCase().trim())}
+                placeholder="your@email.com"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900"
-                maxLength={10}
                 required
               />
               <p className="mt-2 text-xs text-gray-500">
-                Enter 10-digit Indian mobile number
+                We&apos;ll send a verification code to this email
               </p>
             </div>
 
@@ -163,7 +160,7 @@ export default function LoginPage() {
                 required
               />
               <p className="mt-2 text-xs text-gray-500 text-center">
-                OTP sent to {phone}
+                OTP sent to {email}
               </p>
             </div>
 

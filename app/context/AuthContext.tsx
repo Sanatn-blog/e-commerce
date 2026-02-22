@@ -10,9 +10,9 @@ import {
 
 interface Customer {
   id: string;
-  phone: string;
+  email: string;
   name?: string;
-  email?: string;
+  phone?: string;
   image?: string;
   isVerified: boolean;
 }

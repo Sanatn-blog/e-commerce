@@ -264,7 +264,7 @@ export default function AccountPage() {
         .toUpperCase()
         .slice(0, 2);
     }
-    return customer.phone.slice(0, 2);
+    return customer.email.slice(0, 2).toUpperCase();
   };
 
   const getStatusColor = (status: string) => {
@@ -347,9 +347,9 @@ export default function AccountPage() {
                   </h2>
                   <p
                     className="text-sm text-gray-500 truncate"
-                    title={customer.email || customer.phone}
+                    title={customer.email}
                   >
-                    {customer.email || customer.phone}
+                    {customer.email}
                   </p>
                 </div>
               </div>
@@ -357,66 +357,60 @@ export default function AccountPage() {
               <nav className="space-y-2">
                 <button
                   onClick={() => setActiveSection("profile")}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                    activeSection === "profile"
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${activeSection === "profile"
+                    ? "bg-blue-50 text-blue-600 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <User size={20} />
                   <span>Profile</span>
                 </button>
                 <button
                   onClick={() => setActiveSection("orders")}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                    activeSection === "orders"
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${activeSection === "orders"
+                    ? "bg-blue-50 text-blue-600 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <Package size={20} />
                   <span>Orders</span>
                 </button>
                 <button
                   onClick={() => setActiveSection("wishlist")}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                    activeSection === "wishlist"
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${activeSection === "wishlist"
+                    ? "bg-blue-50 text-blue-600 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <Heart size={20} />
                   <span>Wishlist</span>
                 </button>
                 <button
                   onClick={() => setActiveSection("addresses")}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                    activeSection === "addresses"
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${activeSection === "addresses"
+                    ? "bg-blue-50 text-blue-600 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <MapPin size={20} />
                   <span>Addresses</span>
                 </button>
                 <button
                   onClick={() => setActiveSection("payment")}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                    activeSection === "payment"
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${activeSection === "payment"
+                    ? "bg-blue-50 text-blue-600 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <CreditCard size={20} />
                   <span>Payment Methods</span>
                 </button>
                 <button
                   onClick={() => setActiveSection("settings")}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${
-                    activeSection === "settings"
-                      ? "bg-blue-50 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg w-full ${activeSection === "settings"
+                    ? "bg-blue-50 text-blue-600 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                    }`}
                 >
                   <Settings size={20} />
                   <span>Settings</span>
@@ -454,24 +448,24 @@ export default function AccountPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone
-                    </label>
-                    <input
-                      type="tel"
-                      value={customer.phone}
-                      readOnly
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
-                    />
-                  </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email
                     </label>
                     <input
                       type="email"
-                      value={customer.email || "Not provided"}
+                      value={customer.email}
+                      readOnly
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone (Optional)
+                    </label>
+                    <input
+                      type="tel"
+                      value={customer.phone || "Not provided"}
                       readOnly
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
                     />

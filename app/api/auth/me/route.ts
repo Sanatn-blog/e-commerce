@@ -27,9 +27,9 @@ export async function GET() {
     return NextResponse.json({
       customer: {
         id: customer._id,
-        phone: customer.phone,
-        name: customer.name,
         email: customer.email,
+        name: customer.name,
+        phone: customer.phone,
         image: customer.image,
         isVerified: customer.isVerified,
       },

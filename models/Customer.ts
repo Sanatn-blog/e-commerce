@@ -15,9 +15,9 @@ export interface IAddress {
 }
 
 export interface ICustomer extends Document {
-  phone: string;
+  email: string;
   name?: string;
-  email?: string;
+  phone?: string;
   image?: string;
   address?: string;
   address2?: string;
@@ -84,20 +84,23 @@ const AddressSchema = new Schema({
 });
 
 const CustomerSchema: Schema = new Schema({
-  phone: {
+  email: {
     type: String,
     required: true,
     unique: true,
+    lowercase: true,
     trim: true,
+    index: true,
   },
   name: {
     type: String,
     trim: true,
   },
-  email: {
+  phone: {
     type: String,
-    lowercase: true,
     trim: true,
+    required: false,
+    default: "",
   },
   image: {
     type: String,
@@ -148,6 +151,8 @@ const CustomerSchema: Schema = new Schema({
     type: Date,
   },
 });
+
+// Email is already unique in schema definition
 
 export default mongoose.models.Customer ||
   mongoose.model<ICustomer>("Customer", CustomerSchema);

@@ -7,8 +7,9 @@ const secret = new TextEncoder().encode(
 
 export async function createCustomerToken(payload: {
   customerId: string;
-  phone: string;
+  email: string;
   name?: string;
+  phone?: string;
 }) {
   const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })

@@ -14,11 +14,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const router = useRouter();
   const { refreshCustomer } = useAuth();
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [step, setStep] = useState<"phone" | "otp" | "details">("phone");
-  const [phone, setPhone] = useState("");
+  const [step, setStep] = useState<"email" | "otp" | "details">("email");
+  const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,11 +28,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   useEffect(() => {
     if (!isOpen) {
       // Reset form when modal closes
-      setStep("phone");
-      setPhone("");
+      setStep("email");
+      setEmail("");
       setFirstName("");
       setLastName("");
-      setEmail("");
+      setPhone("");
       setOtp("");
       setError("");
       setCountdown(0);
@@ -65,7 +65,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await res.json();
@@ -103,7 +103,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          phone,
+          email,
           otp,
         }),
       });
@@ -144,7 +144,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
-          email: email || undefined,
+          phone: phone || undefined,
         }),
       });
 
@@ -166,7 +166,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const handleResendOTP = () => {
     setOtp("");
-    setStep("phone");
+    setStep("email");
   };
 
   if (!isOpen) return null;
@@ -224,13 +224,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 {mode === "login" ? "Welcome Back" : "Create Account"}
               </h2>
               <p className="text-gray-600">
-                {step === "phone"
+                {step === "email"
                   ? mode === "login"
-                    ? "Enter your phone number to continue"
+                    ? "Enter your email address to continue"
                     : "Sign up to get started"
                   : step === "otp"
-                  ? "Enter the OTP sent to your phone"
-                  : "Complete your profile"}
+                    ? "Enter the OTP sent to your email"
+                    : "Complete your profile"}
               </p>
             </div>
 
@@ -240,26 +240,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </div>
             )}
 
-            {step === "phone" ? (
+            {step === "email" ? (
               <form onSubmit={handleSendOTP} className="space-y-6">
                 <div>
                   <label
-                    htmlFor="phone"
+                    htmlFor="email"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Phone Number
+                    Email Address
                   </label>
                   <input
-                    id="phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+919876543210"
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase().trim())}
+                    placeholder="your@email.com"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 bg-white"
                     required
                   />
                   <p className="mt-2 text-xs text-gray-500">
-                    Enter your 10-digit mobile number with +91
+                    We&apos;ll send a verification code to this email
                   </p>
                 </div>
 
@@ -293,7 +293,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     required
                   />
                   <p className="mt-2 text-xs text-gray-500 text-center">
-                    OTP sent to {phone}
+                    OTP sent to {email}
                   </p>
                 </div>
 
@@ -305,8 +305,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   {loading
                     ? "Verifying..."
                     : mode === "login"
-                    ? "Verify & Login"
-                    : "Verify & Register"}
+                      ? "Verify & Login"
+                      : "Verify & Register"}
                 </button>
 
                 <div className="text-center">
@@ -365,17 +365,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                 <div>
                   <label
-                    htmlFor="email"
+                    htmlFor="phone"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
-                    Email (Optional)
+                    Phone Number (Optional)
                   </label>
                   <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="john@example.com"
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="9876543210"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-gray-900 bg-white"
                   />
                 </div>
@@ -398,7 +398,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     <button
                       onClick={() => {
                         setMode("register");
-                        setStep("phone");
+                        setStep("email");
                         setError("");
                       }}
                       className="text-blue-600 hover:text-blue-700 font-medium"
@@ -412,7 +412,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     <button
                       onClick={() => {
                         setMode("login");
-                        setStep("phone");
+                        setStep("email");
                         setError("");
                       }}
                       className="text-blue-600 hover:text-blue-700 font-medium"

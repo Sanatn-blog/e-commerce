@@ -5,18 +5,18 @@ import { createCustomerToken, setCustomerSession } from "@/lib/customerAuth";
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone, otp, name } = await request.json();
+    const { email, otp, name, phone } = await request.json();
 
-    if (!phone || !otp) {
+    if (!email || !otp) {
       return NextResponse.json(
-        { error: "Phone and OTP are required" },
+        { error: "Email and OTP are required" },
         { status: 400 }
       );
     }
 
     await connectDB();
 
-    const customer = await Customer.findOne({ phone });
+    const customer = await Customer.findOne({ email });
 
     if (!customer) {
       return NextResponse.json(
@@ -41,9 +41,14 @@ export async function POST(request: NextRequest) {
     customer.otp = undefined;
     customer.otpExpiry = undefined;
 
-    // Only update name if provided (for backward compatibility)
+    // Update name if provided
     if (name && !customer.name) {
       customer.name = name;
+    }
+
+    // Update phone if provided
+    if (phone && !customer.phone) {
+      customer.phone = phone;
     }
 
     await customer.save();
@@ -51,8 +56,9 @@ export async function POST(request: NextRequest) {
     // Create session (even if name is not set yet)
     const token = await createCustomerToken({
       customerId: customer._id.toString(),
-      phone: customer.phone,
+      email: customer.email,
       name: customer.name,
+      phone: customer.phone,
     });
 
     await setCustomerSession(token);
@@ -61,9 +67,9 @@ export async function POST(request: NextRequest) {
       message: "Login successful",
       customer: {
         id: customer._id,
-        phone: customer.phone,
-        name: customer.name,
         email: customer.email,
+        name: customer.name,
+        phone: customer.phone,
       },
     });
   } catch (error) {

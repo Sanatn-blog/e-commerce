@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Customer from "@/models/Customer";
-import { generateOTP, sendOTP, isValidPhone } from "@/lib/otp";
+import { generateOTP, sendOTPEmail, isValidEmail } from "@/lib/otp";
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone } = await request.json();
+    const { email, phone, name } = await request.json();
 
-    if (!phone || !isValidPhone(phone)) {
+    if (!email || !isValidEmail(email)) {
       return NextResponse.json(
-        { error: "Valid phone number is required" },
+        { error: "Valid email address is required" },
         { status: 400 }
       );
     }
@@ -20,15 +20,20 @@ export async function POST(request: NextRequest) {
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     // Find or create customer
-    let customer = await Customer.findOne({ phone });
+    let customer = await Customer.findOne({ email });
 
     if (customer) {
       customer.otp = otp;
       customer.otpExpiry = otpExpiry;
+      // Update phone and name if provided
+      if (phone) customer.phone = phone;
+      if (name) customer.name = name;
       await customer.save();
     } else {
       customer = await Customer.create({
-        phone,
+        email,
+        phone: phone || "",
+        name: name || "",
         otp,
         otpExpiry,
         isVerified: false,
@@ -36,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send OTP
-    const sent = await sendOTP(phone, otp);
+    const sent = await sendOTPEmail(email, otp);
 
     if (!sent) {
       return NextResponse.json(
