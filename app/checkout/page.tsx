@@ -278,6 +278,10 @@ export default function CheckoutPage() {
         throw new Error(data.error || "Invalid OTP");
       }
 
+      // User is now logged in - update state
+      setIsLoggedIn(true);
+      setShowOtpModal(false);
+
       // Update customer profile with additional details
       await fetch("/api/auth/update-profile", {
         method: "POST",

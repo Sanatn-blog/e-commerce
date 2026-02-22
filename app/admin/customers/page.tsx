@@ -42,13 +42,13 @@ interface Order {
 
 interface Address {
   _id: string;
-  name: string;
+  fullName: string;
   phone: string;
   addressLine1: string;
   addressLine2?: string;
   city: string;
   state: string;
-  pincode: string;
+  zipCode: string;
   isDefault: boolean;
 }
 
@@ -489,9 +489,9 @@ export default function CustomersPage() {
                             <div className="bg-purple-50 p-4 rounded-lg">
                               <p className="text-sm text-gray-600">Avg Order</p>
                               <p className="text-2xl font-bold text-purple-600">
-                                $
+                                ₹
                                 {customerDetails.stats.averageOrderValue.toFixed(
-                                  2
+                                  0
                                 )}
                               </p>
                             </div>
@@ -565,7 +565,7 @@ export default function CustomersPage() {
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2">
                                         <p className="font-medium text-gray-900">
-                                          {address.name}
+                                          {address.fullName}
                                         </p>
                                         {address.isDefault && (
                                           <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
@@ -583,7 +583,7 @@ export default function CustomersPage() {
                                       </p>
                                       <p className="text-sm text-gray-600">
                                         {address.city}, {address.state} -{" "}
-                                        {address.pincode}
+                                        {address.zipCode}
                                       </p>
                                     </div>
                                   </div>

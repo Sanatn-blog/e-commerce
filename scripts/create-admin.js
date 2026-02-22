@@ -41,8 +41,8 @@ async function createAdmin() {
     await mongoose.connect(MONGODB_URL);
     console.log("✅ Connected to MongoDB");
 
-    const email = process.argv[2] || "admin@example.com";
-    const password = process.argv[3] || "Admin123!";
+    const email = process.argv[2] || "jankit403@gmail.com";
+    const password = process.argv[3] || "1415592055";
     const name = process.argv[4] || "Admin User";
 
     const existingAdmin = await Admin.findOne({ email });
